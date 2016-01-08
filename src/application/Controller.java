@@ -8,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
@@ -32,6 +33,11 @@ public class Controller implements Initializable {
 					borderPane.requestFocus();
 			}
 		});
+		
+		Thread thread = new Thread(()->{
+			logic.drawGraphics(canvas.getGraphicsContext2D());
+		});
+		thread.start();
 		
 //		Platform.runLater(new Runnable() {
 //			@Override

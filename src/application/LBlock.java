@@ -13,7 +13,7 @@ public class LBlock extends Block{
 		// x = pattern[0][3], y = pattern[1][3]
 		// This will draw the complete shape, by incrementing the first index a new rotation will be drawn.
 		
-		this.pattern = new int[][] { { 0, 0, 0, 1 }, { -1, 0, 1, 1 }, { 0, 0, 0, -1 }, { -1, 0, 1, -1 } };
+		this.pattern = new int[][] { { 0, 0, 0, -1 }, { -1, 0, 1, 1 }, { 0, 0, 0, 1 }, { 1, 0, -1, -1 } };
 	}
 
 	@Override

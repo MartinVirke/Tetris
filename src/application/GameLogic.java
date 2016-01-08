@@ -1,5 +1,8 @@
 package application;
 
+import java.util.Random;
+
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 
 public class GameLogic {
@@ -9,14 +12,15 @@ public class GameLogic {
 	private int cellsInY;
 	private boolean isRunning;
 	private int updateTime;
+	private float unit;
 
 	Block currentBlock;
 	Block nextStepBlock;
 
 	private Action action;
 
-	private enum Action{
-		LEFT, RIGHT, ROTATE, DROP
+	private enum Action {
+		LEFT, RIGHT, ROTATE, DROP, FALL
 	}
 
 	public GameLogic() {
@@ -26,24 +30,16 @@ public class GameLogic {
 		this.cellArray = new Cell[cellsInX][cellsInY];
 		populateArray();
 
+		newBlock();
 		// *****************TEMP*********************
 		isRunning = true;
 		updateTime = 50;
 
 		Thread thread = new Thread(() -> {
 			while (isRunning) {
-				for (int i = 0; i < cellsInY; i++) {
-					for (int j = 0; j < cellsInX; j++) {
-						if (cellArray[j][i].isAlive())
-							System.out.print("|X");
-						else
-							System.out.print("|O");
-					}
-					System.out.print("|\n");
-				}
-				System.out.println("");
+				moveBlock(action.FALL);
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(400);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -55,14 +51,12 @@ public class GameLogic {
 
 	}
 
-	
 	private void populateArray() {
 		for (int i = 0; i < cellsInY; i++) {
 			for (int j = 0; j < cellsInX; j++) {
 				cellArray[j][i] = new Cell(j, i);
 			}
 		}
-		currentBlock = new LBlock(5, 5, 0);
 	}
 
 	public void keyPressed(KeyCode code) {
@@ -72,12 +66,12 @@ public class GameLogic {
 			// Rotate
 			System.out.println("w");
 			moveBlock(Action.ROTATE);
-//			rotateBlock();
+			// rotateBlock();
 			break;
 		case A:
 			System.out.println("a");
 			moveBlock(Action.LEFT);
-//			moveLeft();
+			// moveLeft();
 			break;
 		case S:
 			System.out.println("s");
@@ -139,11 +133,10 @@ public class GameLogic {
 		return true;
 	}
 
-	
 	private void moveBlock(Action action) {
 
 		nextStepBlock = currentBlock.makeCopy();
-		
+
 		switch (action) {
 		case ROTATE:
 			nextStepBlock.incRot();
@@ -156,43 +149,78 @@ public class GameLogic {
 			break;
 		case DROP:
 			break;
+		case FALL:
+			nextStepBlock.setY(nextStepBlock.getY() + 1);
+			break;
+		default:
+			break;
 		}
-		
+
 		deactivateBlockCells(currentBlock);
 		if (!isValidCell(0, nextStepBlock)) {
 			activateBlockCells(currentBlock);
+			if (action == action.FALL)
+				newBlock();
 		} else {
 			activateBlockCells(nextStepBlock);
 			currentBlock = nextStepBlock;
 		}
 
 	}
-	
-//	private void moveLeft() {
-//
-//		nextStepBlock = currentBlock.makeCopy();
-//		nextStepBlock.setX(nextStepBlock.getX() - 1);
-//		deactivateBlockCells(currentBlock);
-//		if (!isValidCell(0, nextStepBlock)) {
-//			activateBlockCells(currentBlock);
-//		} else {
-//			activateBlockCells(nextStepBlock);
-//			currentBlock = nextStepBlock;
-//		}
-//
-//	}
 
-//	private void rotateBlock() {
-//		nextStepBlock = currentBlock.makeCopy();
-//		nextStepBlock.incRot();
-//		deactivateBlockCells(currentBlock);
-//		if (!isValidCell(0, nextStepBlock)) {
-//			activateBlockCells(currentBlock);
-//		} else {
-//			activateBlockCells(nextStepBlock);
-//			currentBlock = nextStepBlock;
-//		}
-//	}
+	// private void moveLeft() {
+	//
+	// nextStepBlock = currentBlock.makeCopy();
+	// nextStepBlock.setX(nextStepBlock.getX() - 1);
+	// deactivateBlockCells(currentBlock);
+	// if (!isValidCell(0, nextStepBlock)) {
+	// activateBlockCells(currentBlock);
+	// } else {
+	// activateBlockCells(nextStepBlock);
+	// currentBlock = nextStepBlock;
+	// }
+	//
+	// }
+
+	// private void rotateBlock() {
+	// nextStepBlock = currentBlock.makeCopy();
+	// nextStepBlock.incRot();
+	// deactivateBlockCells(currentBlock);
+	// if (!isValidCell(0, nextStepBlock)) {
+	// activateBlockCells(currentBlock);
+	// } else {
+	// activateBlockCells(nextStepBlock);
+	// currentBlock = nextStepBlock;
+	// }
+	// }
+
+	private void newBlock() {
+		Random random = new Random();
+		int randomInt = random.nextInt(7);
+		switch (randomInt) {
+		case 0:
+			currentBlock = new LBlock(5,5,0);
+			break;
+		case 1:
+			currentBlock = new RLBlock(5,5,0);
+			break;
+		case 2:
+			currentBlock = new SBlock(5,5,0);
+			break;
+		case 3:
+			currentBlock = new RSBlock(5,5,0);
+			break;
+		case 4:
+			currentBlock = new SquareBlock(5,5,0);
+			break;
+		case 5:
+			currentBlock = new TBlock(5,5,0);
+			break;
+		case 6:
+			currentBlock = new LineBlock(5,5,0);
+			break;
+		}
+	}
 
 	public int getUpdateTime() {
 		return updateTime;
@@ -200,6 +228,25 @@ public class GameLogic {
 
 	public boolean isRunning() {
 		return isRunning;
+	}
+
+	public void drawGraphics(GraphicsContext gc) {
+		unit = (float) (gc.getCanvas().getWidth() / cellsInX);
+		while (isRunning) {
+			gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
+			for (int i = 0; i < cellsInY; i++) {
+				for (int j = 0; j < cellsInX; j++) {
+					if(cellArray[j][i].isAlive())
+						gc.fillRect(cellArray[j][i].getX() * unit, cellArray[j][i].getY() * unit, unit, unit);
+				}
+			}
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
 	}
 
 }

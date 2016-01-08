@@ -4,7 +4,8 @@ public class LineBlock extends Block{
 
 	public LineBlock(int x, int y, int rot) {
 		super(x, y, rot);
-		// TODO Auto-generated constructor stub
+
+		this.pattern = new int[][] { { 0, 0, 0, 0 }, { -2, -1, 0, 1 }, { 0, 0, 0, 0 }, { 2, 1, 0, -1 } };
 	}
 	
 	@Override
