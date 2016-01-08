@@ -55,7 +55,7 @@ public class GameLogic {
 				cellArray[j][i] = new Cell(j, i);
 			}
 		}
-		currentBlock = new LBlock(5, 5);
+		currentBlock = new LBlock(5, 5, 0);
 	}
 
 	public void keyPressed(KeyCode code) {
@@ -88,54 +88,67 @@ public class GameLogic {
 
 	}
 
-	public boolean isOccupied(Cell cell) {
-		return cell.isAlive();
+
+	private Cell getAffectedCell(int index) {
+		int tmpX = currentBlock.getPattern()[currentBlock.getRot()][index];
+		int tmpY = currentBlock.getPattern()[currentBlock.getYRot()][index];
+		return cellArray[currentBlock.getX() + tmpX][currentBlock.getY() + tmpY];
 	}
 
-	private Cell getAffectedCell(Block block, int index) {
-		int tmpX = 0;
-		int tmpY = 0;
-		tmpX = block.getPattern()[block.getRot()][index];
-		tmpY = block.getPattern()[block.getYRot()][index];
-
-		return cellArray[block.getX() + tmpX][block.getY() + tmpY];
+	private void activateBlockCells() {
+		for (int i = 0; i < 4; i++) {
+			getAffectedCell(i).setAlive(true);
+		}
 	}
 
-	private void activateBlockCells(Cell cell) {
-		cell.setAlive(true);
+	private void deactivateBlockCells() {
+		for (int i = 0; i < 4; i++) {
+			getAffectedCell(i).setAlive(false);
+		}
 	}
 
-	private void deactivateBlockCells(Cell cell) {
-		cell.setAlive(false);
+	boolean isAlive(int index) {
+		if (getAffectedCell(index).isAlive()) {
+			return true;
+		} else if (index < 3) {
+			isAlive(index + 1);
+		}
+		return false;
 	}
 
 	private void rotateBlock() {
 		// ****TEMP****
 		// ************
-		nextStepBlock = currentBlock;
-		nextStepBlock.incRot();
+		// nextStepBlock = currentBlock.makeCopy();
+		// nextStepBlock.incRot();
+		// System.out.println(nextStepBlock.getRot() + " nextStep");
 
+		deactivateBlockCells();
+		currentBlock.incRot();
 		for (int i = 0; i < 4; i++) {
-			deactivateBlockCells(getAffectedCell(currentBlock, i));
-			activateBlockCells(getAffectedCell(currentBlock,i));
-			// if (getAffectedCell(currentBlock, i).getX() !=
-			// getAffectedCell(nextStepBlock, i).getX()
-			// && getAffectedCell(currentBlock, i).getY() !=
-			// getAffectedCell(nextStepBlock, i).getY()) {
-			// if (!isOccupied(getAffectedCell(nextStepBlock, i))) {
-//			activateBlockCells(getAffectedCell(nextStepBlock, i));
-			// } else {
-			// for (int j = 0; j < i; j++) {
-			// deactivateBlockCells(getAffectedCell(nextStepBlock, j));
-			// activateBlockCells(getAffectedCell(currentBlock, j));
-			// }
-			// currentBlock = nextStepBlock;
-			// break;
-			// }
-			// }
-
+			if (isAlive(0)) {
+				activateBlockCells();
+				break;
+			}
 		}
-//		currentBlock = nextStepBlock;
+		activateBlockCells();
+
+		// if (getAffectedCell(currentBlock, i).getX() !=
+		// getAffectedCell(nextStepBlock, i).getX()
+		// && getAffectedCell(currentBlock, i).getY() !=
+		// getAffectedCell(nextStepBlock, i).getY()) {
+		// if (!isOccupied(getAffectedCell(nextStepBlock, i))) {
+		// } else {
+		// for (int j = 0; j < i; j++) {
+		// deactivateBlockCells(getAffectedCell(nextStepBlock, j));
+		// activateBlockCells(getAffectedCell(currentBlock, j));
+		// }
+		// currentBlock = nextStepBlock;
+		// break;
+		// }
+		// }
+
+		// currentBlock = nextStepBlock;
 
 	}
 

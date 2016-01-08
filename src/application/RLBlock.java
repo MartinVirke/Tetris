@@ -2,9 +2,13 @@ package application;
 
 public class RLBlock extends Block {
 
-	public RLBlock(int x, int y) {
-		super(x, y);
+	public RLBlock(int x, int y, int rot) {
+		super(x, y, rot);
 		// TODO Auto-generated constructor stub
 	}
 
+	@Override
+	public Block makeCopy() {
+		return new RLBlock(this.getX(), this.getY(), this.getRot());
+	}
 }
