@@ -86,8 +86,7 @@ public class GameLogic {
 	}
 
 	public boolean isOccupied(Cell cell) {
-
-		return false;
+		return cell.isAlive();
 	}
 
 	private Cell getAffectedCell(Block block, int index) {
