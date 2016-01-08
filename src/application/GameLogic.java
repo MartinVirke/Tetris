@@ -11,7 +11,7 @@ public class GameLogic {
 	private int cellsInX;
 	private int cellsInY;
 	private boolean isRunning;
-	private int updateTime;
+	private int updateTime, spawnX, spawnY;
 	private float unit;
 
 	Block currentBlock;
@@ -28,6 +28,8 @@ public class GameLogic {
 		this.cellsInX = 10;
 		this.cellsInY = 20;
 		this.cellArray = new Cell[cellsInX][cellsInY];
+		this.spawnX = 5;
+		this.spawnY = 1;
 		populateArray();
 
 		newBlock();
@@ -39,7 +41,7 @@ public class GameLogic {
 			while (isRunning) {
 				moveBlock(action.FALL);
 				try {
-					Thread.sleep(400);
+					Thread.sleep(1000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -64,28 +66,18 @@ public class GameLogic {
 		switch (code) {
 		case W:
 			// Rotate
-			System.out.println("w");
 			moveBlock(Action.ROTATE);
-			// rotateBlock();
 			break;
 		case A:
-			System.out.println("a");
 			moveBlock(Action.LEFT);
-			// moveLeft();
 			break;
 		case S:
-			System.out.println("s");
-			// Speed up
 			break;
 		case D:
-			System.out.println("d");
 			moveBlock(Action.RIGHT);
-			// Move right
 			break;
 		case SPACE:
-			System.out.println("space");
 			moveBlock(Action.DROP);
-			// Instant drop
 			break;
 		default:
 			break;
@@ -136,6 +128,7 @@ public class GameLogic {
 	private void moveBlock(Action action) {
 
 		nextStepBlock = currentBlock.makeCopy();
+		deactivateBlockCells(currentBlock);
 
 		switch (action) {
 		case ROTATE:
@@ -148,6 +141,10 @@ public class GameLogic {
 			nextStepBlock.setX(nextStepBlock.getX() + 1);
 			break;
 		case DROP:
+			while (isValidCell(0, nextStepBlock)){
+				System.out.println("asd");
+				nextStepBlock.setY(nextStepBlock.getY() + 1);
+			}
 			break;
 		case FALL:
 			nextStepBlock.setY(nextStepBlock.getY() + 1);
@@ -156,11 +153,12 @@ public class GameLogic {
 			break;
 		}
 
-		deactivateBlockCells(currentBlock);
 		if (!isValidCell(0, nextStepBlock)) {
 			activateBlockCells(currentBlock);
-			if (action == action.FALL)
+			if (action == action.FALL){
 				newBlock();
+				activateBlockCells(currentBlock);
+			}
 		} else {
 			activateBlockCells(nextStepBlock);
 			currentBlock = nextStepBlock;
@@ -168,56 +166,30 @@ public class GameLogic {
 
 	}
 
-	// private void moveLeft() {
-	//
-	// nextStepBlock = currentBlock.makeCopy();
-	// nextStepBlock.setX(nextStepBlock.getX() - 1);
-	// deactivateBlockCells(currentBlock);
-	// if (!isValidCell(0, nextStepBlock)) {
-	// activateBlockCells(currentBlock);
-	// } else {
-	// activateBlockCells(nextStepBlock);
-	// currentBlock = nextStepBlock;
-	// }
-	//
-	// }
-
-	// private void rotateBlock() {
-	// nextStepBlock = currentBlock.makeCopy();
-	// nextStepBlock.incRot();
-	// deactivateBlockCells(currentBlock);
-	// if (!isValidCell(0, nextStepBlock)) {
-	// activateBlockCells(currentBlock);
-	// } else {
-	// activateBlockCells(nextStepBlock);
-	// currentBlock = nextStepBlock;
-	// }
-	// }
-
 	private void newBlock() {
 		Random random = new Random();
 		int randomInt = random.nextInt(7);
 		switch (randomInt) {
 		case 0:
-			currentBlock = new LBlock(5,5,0);
+			currentBlock = new LBlock(spawnX, spawnY, 0);
 			break;
 		case 1:
-			currentBlock = new RLBlock(5,5,0);
+			currentBlock = new RLBlock(spawnX, spawnY, 0);
 			break;
 		case 2:
-			currentBlock = new SBlock(5,5,0);
+			currentBlock = new SBlock(spawnX, spawnY, 0);
 			break;
 		case 3:
-			currentBlock = new RSBlock(5,5,0);
+			currentBlock = new RSBlock(spawnX, spawnY, 0);
 			break;
 		case 4:
-			currentBlock = new SquareBlock(5,5,0);
+			currentBlock = new SquareBlock(spawnX, spawnY, 0);
 			break;
 		case 5:
-			currentBlock = new TBlock(5,5,0);
+			currentBlock = new TBlock(spawnX, spawnY, 0);
 			break;
 		case 6:
-			currentBlock = new LineBlock(5,5,0);
+			currentBlock = new LineBlock(spawnX, spawnY, 0);
 			break;
 		}
 	}
@@ -236,7 +208,7 @@ public class GameLogic {
 			gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
 			for (int i = 0; i < cellsInY; i++) {
 				for (int j = 0; j < cellsInX; j++) {
-					if(cellArray[j][i].isAlive())
+					if (cellArray[j][i].isAlive())
 						gc.fillRect(cellArray[j][i].getX() * unit, cellArray[j][i].getY() * unit, unit, unit);
 				}
 			}
