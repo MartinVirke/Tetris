@@ -13,6 +13,12 @@ public class GameLogic {
 	Block currentBlock;
 	Block nextStepBlock;
 
+	private Action action;
+
+	private enum Action{
+		LEFT, RIGHT, ROTATE, DROP
+	}
+
 	public GameLogic() {
 		super();
 		this.cellsInX = 10;
@@ -49,6 +55,7 @@ public class GameLogic {
 
 	}
 
+	
 	private void populateArray() {
 		for (int i = 0; i < cellsInY; i++) {
 			for (int j = 0; j < cellsInX; j++) {
@@ -64,11 +71,13 @@ public class GameLogic {
 		case W:
 			// Rotate
 			System.out.println("w");
-			rotateBlock();
+			moveBlock(Action.ROTATE);
+//			rotateBlock();
 			break;
 		case A:
 			System.out.println("a");
-			moveLeft();
+			moveBlock(Action.LEFT);
+//			moveLeft();
 			break;
 		case S:
 			System.out.println("s");
@@ -76,10 +85,12 @@ public class GameLogic {
 			break;
 		case D:
 			System.out.println("d");
+			moveBlock(Action.RIGHT);
 			// Move right
 			break;
 		case SPACE:
 			System.out.println("space");
+			moveBlock(Action.DROP);
 			// Instant drop
 			break;
 		default:
@@ -128,10 +139,25 @@ public class GameLogic {
 		return true;
 	}
 
-	private void moveLeft() {
+	
+	private void moveBlock(Action action) {
 
 		nextStepBlock = currentBlock.makeCopy();
-		nextStepBlock.setX(nextStepBlock.getX() - 1);
+		
+		switch (action) {
+		case ROTATE:
+			nextStepBlock.incRot();
+			break;
+		case LEFT:
+			nextStepBlock.setX(nextStepBlock.getX() - 1);
+			break;
+		case RIGHT:
+			nextStepBlock.setX(nextStepBlock.getX() + 1);
+			break;
+		case DROP:
+			break;
+		}
+		
 		deactivateBlockCells(currentBlock);
 		if (!isValidCell(0, nextStepBlock)) {
 			activateBlockCells(currentBlock);
@@ -141,18 +167,32 @@ public class GameLogic {
 		}
 
 	}
+	
+//	private void moveLeft() {
+//
+//		nextStepBlock = currentBlock.makeCopy();
+//		nextStepBlock.setX(nextStepBlock.getX() - 1);
+//		deactivateBlockCells(currentBlock);
+//		if (!isValidCell(0, nextStepBlock)) {
+//			activateBlockCells(currentBlock);
+//		} else {
+//			activateBlockCells(nextStepBlock);
+//			currentBlock = nextStepBlock;
+//		}
+//
+//	}
 
-	private void rotateBlock() {
-		nextStepBlock = currentBlock.makeCopy();
-		nextStepBlock.incRot();
-		deactivateBlockCells(currentBlock);
-		if (!isValidCell(0, nextStepBlock)) {
-			activateBlockCells(currentBlock);
-		} else {
-			activateBlockCells(nextStepBlock);
-			currentBlock = nextStepBlock;
-		}
-	}
+//	private void rotateBlock() {
+//		nextStepBlock = currentBlock.makeCopy();
+//		nextStepBlock.incRot();
+//		deactivateBlockCells(currentBlock);
+//		if (!isValidCell(0, nextStepBlock)) {
+//			activateBlockCells(currentBlock);
+//		} else {
+//			activateBlockCells(nextStepBlock);
+//			currentBlock = nextStepBlock;
+//		}
+//	}
 
 	public int getUpdateTime() {
 		return updateTime;
