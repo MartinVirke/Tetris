@@ -18,5 +18,13 @@ public class Cell {
 	public void setAlive(boolean alive) {
 		this.alive = alive;
 	}
-	
+
+	public int getX() {
+		return x;
+	}
+
+	public int getY() {
+		return y;
+	}
+
 }

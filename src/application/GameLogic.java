@@ -1,6 +1,5 @@
 package application;
 
-import javafx.application.Platform;
 import javafx.scene.input.KeyCode;
 
 public class GameLogic {
@@ -10,6 +9,9 @@ public class GameLogic {
 	private int cellsInY;
 	private boolean isRunning;
 	private int updateTime;
+
+	Block currentBlock;
+	Block nextStepBlock;
 
 	public GameLogic() {
 		super();
@@ -22,7 +24,7 @@ public class GameLogic {
 		isRunning = true;
 		updateTime = 50;
 
-		Thread thread = new Thread(()->{
+		Thread thread = new Thread(() -> {
 			while (isRunning) {
 				for (int i = 0; i < cellsInY; i++) {
 					for (int j = 0; j < cellsInX; j++) {
@@ -53,6 +55,7 @@ public class GameLogic {
 				cellArray[j][i] = new Cell(j, i);
 			}
 		}
+		currentBlock = new LBlock(5, 5);
 	}
 
 	public void keyPressed(KeyCode code) {
@@ -98,21 +101,41 @@ public class GameLogic {
 		return cellArray[block.getX() + tmpX][block.getY() + tmpY];
 	}
 
-	private void activateCell(){
-		cellArray[1][1].setAlive(true);
+	private void activateBlockCells(Cell cell) {
+		cell.setAlive(true);
 	}
-	
+
+	private void deactivateBlockCells(Cell cell) {
+		cell.setAlive(false);
+	}
+
 	private void rotateBlock() {
 		// ****TEMP****
-		Block currentBlock = new LBlock(5, 5);
-		currentBlock.setRot(currentBlock.getRot() + 1);
 		// ************
-		for (int i = 0; i < 4; i++) {
-			if (isOccupied(getAffectedCell(currentBlock, i))) {
+		nextStepBlock = currentBlock;
+		nextStepBlock.incRot();
 
-			}
+		for (int i = 0; i < 4; i++) {
+			deactivateBlockCells(getAffectedCell(currentBlock, i));
+			activateBlockCells(getAffectedCell(currentBlock,i));
+			// if (getAffectedCell(currentBlock, i).getX() !=
+			// getAffectedCell(nextStepBlock, i).getX()
+			// && getAffectedCell(currentBlock, i).getY() !=
+			// getAffectedCell(nextStepBlock, i).getY()) {
+			// if (!isOccupied(getAffectedCell(nextStepBlock, i))) {
+//			activateBlockCells(getAffectedCell(nextStepBlock, i));
+			// } else {
+			// for (int j = 0; j < i; j++) {
+			// deactivateBlockCells(getAffectedCell(nextStepBlock, j));
+			// activateBlockCells(getAffectedCell(currentBlock, j));
+			// }
+			// currentBlock = nextStepBlock;
+			// break;
+			// }
+			// }
 
 		}
+//		currentBlock = nextStepBlock;
 
 	}
 

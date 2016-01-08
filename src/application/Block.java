@@ -34,8 +34,8 @@ public abstract class Block {
 		this.y = y;
 	}
 
-	public void setRot(int rot) {
-		this.rot = rot;
+	public void incRot() {
+		this.rot = rot + 1 > 3 ? 0 : this.rot + 1;
 	}
 
 	public int[][] getPattern() {
