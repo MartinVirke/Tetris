@@ -4,13 +4,25 @@ public abstract class Block {
 
 	private int x, y, rot;
 	protected int[][] pattern;
+	protected Color color;
+	
+	protected enum Color{
+		BLUE, GREEN, LIGHTBLUE, PURPLE, RED, TURQUOISE, YELLOW
+	}
+	
 
-	public Block(int x, int y, int rot) {
+	public Block(int x, int y, int rot, Color color) {
 		this.x = x;
 		this.y = y;
 		this.rot = rot;
-	}
+		this.color = color;
+		}
+		
 	
+	public Color getColor() {
+		return color;
+	}
+
 	public int getX() {
 		return x;
 	}

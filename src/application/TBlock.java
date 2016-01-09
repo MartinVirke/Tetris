@@ -3,7 +3,7 @@ package application;
 public class TBlock extends Block{
 
 	public TBlock(int x, int y, int rot) {
-		super(x, y, rot);
+		super(x, y, rot, Color.YELLOW);
 		this.pattern = new int[][] { { -1, 0, 1, 0 }, { 0, 0, 0, 1 }, { 1, 0, -1, 0 }, { 0, 0, 0, -1 } };
 	}
 	

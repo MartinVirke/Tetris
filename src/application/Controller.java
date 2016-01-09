@@ -57,6 +57,10 @@ public class Controller implements Initializable {
 			logic.keyPressed(event.getCode());
 		});
 		
+		borderPane.setOnKeyReleased(event->{
+			logic.keyReleased(event.getCode());
+		});
+		
 	}
 
 }

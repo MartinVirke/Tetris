@@ -3,6 +3,7 @@ package application;
 import java.util.Random;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 
 public class GameLogic {
@@ -13,6 +14,7 @@ public class GameLogic {
 	private boolean isRunning, instantUpdate;
 	private int updateTime, spawnX, spawnY;
 	private float unit;
+	private Image[] imageArray;
 	Thread gameThread;
 
 	Block currentBlock;
@@ -31,14 +33,22 @@ public class GameLogic {
 		this.cellArray = new Cell[cellsInX][cellsInY];
 		this.spawnX = 5;
 		this.spawnY = 3;
+		addImages();
 		populateArray();
 		gameUpdate();
 		newBlock();
-		// *****************TEMP*********************
-		updateTime = 1000;
+		updateTime = 100;
+	}
 
-		// *****************************************
-
+	private void addImages() {
+		imageArray = new Image[7];
+		imageArray[0] = new Image("Image/blue.jpg");
+		imageArray[1] = new Image("Image/green.jpg");
+		imageArray[2] = new Image("Image/lightblue.jpg");
+		imageArray[3] = new Image("Image/purple.jpg");
+		imageArray[4] = new Image("Image/red.jpg");
+		imageArray[5] = new Image("Image/turquoise.jpg");
+		imageArray[6] = new Image("Image/yellow.jpg");
 	}
 
 	private void gameUpdate() {
@@ -47,20 +57,19 @@ public class GameLogic {
 			int count = 0;
 			while (isRunning) {
 				try {
-					if (!instantUpdate){
+					if (!instantUpdate) {
 						Thread.sleep(10);
 						count++;
-						if(count >= 100){
+						if (count >= updateTime) {
 							moveBlock(Action.FALL);
 							count = 0;
 						}
-					}
-					else{
+					} else {
 						moveBlock(Action.FALL);
 						count = 0;
 						instantUpdate = false;
 					}
-						
+
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -73,7 +82,7 @@ public class GameLogic {
 	private void populateArray() {
 		for (int i = 0; i < cellsInY; i++) {
 			for (int j = 0; j < cellsInX; j++) {
-				cellArray[j][i] = new Cell(j, i);
+				cellArray[j][i] = new Cell(j, i, 0);
 			}
 		}
 	}
@@ -82,13 +91,13 @@ public class GameLogic {
 
 		switch (code) {
 		case W:
-			// Rotate
 			moveBlock(Action.ROTATE);
 			break;
 		case A:
 			moveBlock(Action.LEFT);
 			break;
 		case S:
+			updateTime = 10;
 			break;
 		case D:
 			moveBlock(Action.RIGHT);
@@ -100,6 +109,16 @@ public class GameLogic {
 			break;
 		}
 
+	}
+
+	public void keyReleased(KeyCode code) {
+		switch (code) {
+		case S:
+			updateTime = 100;
+			break;
+		default:
+			break;
+		}
 	}
 
 	private int getCellX(int index, Block block) {
@@ -114,6 +133,7 @@ public class GameLogic {
 
 	private void activateBlockCells(Block block) {
 		for (int i = 0; i < 4; i++) {
+			cellArray[getCellX(i, block)][getCellY(i, block)].setColorId(block.getColor().ordinal());
 			cellArray[getCellX(i, block)][getCellY(i, block)].setAlive(true);
 		}
 	}
@@ -224,9 +244,37 @@ public class GameLogic {
 			currentBlock = new LineBlock(spawnX, spawnY, 0);
 			break;
 		}
-		
 		instantUpdate = true;
 
+		removeLines();
+
+	}
+
+	private void removeLines() {
+		int count = 0;
+		for (int i = 0; i < cellsInY; i++) {
+			for (int j = 0; j < cellsInX; j++) {
+				if (!cellArray[j][i].isAlive())
+					break;
+				else {
+					count++;
+				}
+				if (count == cellsInX) {
+					moveLinesDown(i);
+				}
+			}
+			count = 0;
+		}
+	}
+
+	private void moveLinesDown(int startRow) {
+		for (int i = startRow; i > 0; i--) {
+			for (int j = 0; j < cellsInX; j++) {
+				cellArray[j][i] = cellArray[j][i - 1];
+				cellArray[j][i].setX(j);
+				cellArray[j][i].setY(i);
+			}
+		}
 	}
 
 	public int getUpdateTime() {
@@ -244,7 +292,8 @@ public class GameLogic {
 			for (int i = 0; i < cellsInY; i++) {
 				for (int j = 0; j < cellsInX; j++) {
 					if (cellArray[j][i].isAlive())
-						gc.fillRect(cellArray[j][i].getX() * unit, cellArray[j][i].getY() * unit, unit, unit);
+						gc.drawImage(imageArray[cellArray[j][i].getColorId()], cellArray[j][i].getX() * unit,
+								cellArray[j][i].getY() * unit, unit, unit);
 				}
 			}
 			try {
