@@ -5,11 +5,10 @@ public class Cell {
 	private int x,y,colorId;
 	private boolean alive;
 	
-	public Cell(int x, int y, int colorId) {
+	public Cell(int x, int y) {
 		super();
 		this.x = x;
 		this.y = y;
-		this.colorId = colorId;
 	}
 
 	public boolean isAlive() {

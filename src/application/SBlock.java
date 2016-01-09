@@ -3,9 +3,9 @@ package application;
 public class SBlock extends Block{
 
 	public SBlock(int x, int y, int rot) {
-		super(x, y, rot, Color.TURQUOISE);
+		super(x, y, rot, Color.PURPLE);
 
-		this.pattern = new int[][] { { -1, 0, 0, 1 }, { 0, 0, 1, 1 }, { 1, 0, 0, -1 }, { 0, 0, -1, -1 } };
+		this.pattern = new int[][] { { -1, 0, 0, 1 }, { 1, 1, 0, 0 }, { 1, 0, 0, -1 }, { -1, -1, 0, 0 } };
 
 	}
 

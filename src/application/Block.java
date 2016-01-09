@@ -48,7 +48,8 @@ public abstract class Block {
 	}
 
 	public void incRot() {
-		this.rot = rot + 1 > 3 ? 0 : rot + 1;
+//		this.rot = rot + 1 > 3 ? 0 : rot + 1;
+		this.rot = rot - 1 < 0 ? 3 : rot - 1;
 	}
 	
 	public void setRot(int i){
