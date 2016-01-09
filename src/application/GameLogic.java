@@ -10,14 +10,15 @@ public class GameLogic {
 	private Cell[][] cellArray;
 	private int cellsInX;
 	private int cellsInY;
-	private boolean isRunning;
+	private boolean isRunning, instantUpdate;
 	private int updateTime, spawnX, spawnY;
 	private float unit;
+	Thread gameThread;
 
 	Block currentBlock;
 	Block nextStepBlock;
 
-	private Action action;
+	// private Action action;
 
 	private enum Action {
 		LEFT, RIGHT, ROTATE, DROP, FALL
@@ -29,28 +30,44 @@ public class GameLogic {
 		this.cellsInY = 20;
 		this.cellArray = new Cell[cellsInX][cellsInY];
 		this.spawnX = 5;
-		this.spawnY = 1;
+		this.spawnY = 3;
 		populateArray();
-
+		gameUpdate();
 		newBlock();
 		// *****************TEMP*********************
-		isRunning = true;
-		updateTime = 50;
+		updateTime = 1000;
 
-		Thread thread = new Thread(() -> {
+		// *****************************************
+
+	}
+
+	private void gameUpdate() {
+		gameThread = new Thread(() -> {
+			isRunning = true;
+			int count = 0;
 			while (isRunning) {
-				moveBlock(action.FALL);
 				try {
-					Thread.sleep(1000);
+					if (!instantUpdate){
+						Thread.sleep(10);
+						count++;
+						if(count >= 100){
+							moveBlock(Action.FALL);
+							count = 0;
+						}
+					}
+					else{
+						moveBlock(Action.FALL);
+						count = 0;
+						instantUpdate = false;
+					}
+						
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
 
 		});
-		thread.start();
-		// *****************************************
-
+		gameThread.start();
 	}
 
 	private void populateArray() {
@@ -98,7 +115,6 @@ public class GameLogic {
 	private void activateBlockCells(Block block) {
 		for (int i = 0; i < 4; i++) {
 			cellArray[getCellX(i, block)][getCellY(i, block)].setAlive(true);
-			;
 		}
 	}
 
@@ -141,10 +157,7 @@ public class GameLogic {
 			nextStepBlock.setX(nextStepBlock.getX() + 1);
 			break;
 		case DROP:
-			while (isValidCell(0, nextStepBlock)){
-				System.out.println("asd");
-				nextStepBlock.setY(nextStepBlock.getY() + 1);
-			}
+			nextStepBlock.setY(findLowpoint(nextStepBlock));
 			break;
 		case FALL:
 			nextStepBlock.setY(nextStepBlock.getY() + 1);
@@ -153,17 +166,36 @@ public class GameLogic {
 			break;
 		}
 
-		if (!isValidCell(0, nextStepBlock)) {
+		if (!isValidCell(0, nextStepBlock) && action != Action.DROP) {
 			activateBlockCells(currentBlock);
-			if (action == action.FALL){
+			if (action == Action.FALL) {
 				newBlock();
 				activateBlockCells(currentBlock);
 			}
 		} else {
 			activateBlockCells(nextStepBlock);
 			currentBlock = nextStepBlock;
+			if (action == Action.DROP) {
+				newBlock();
+			}
 		}
 
+	}
+
+	private int findLowpoint(Block block) {
+		int count = block.getY();
+		boolean run = true;
+		while (run) {
+			if (isValidCell(0, block)) {
+				nextStepBlock.setY(nextStepBlock.getY() + 1);
+				count++;
+			} else {
+				count--;
+				break;
+			}
+			System.out.println(nextStepBlock.getY());
+		}
+		return count;
 	}
 
 	private void newBlock() {
@@ -192,6 +224,9 @@ public class GameLogic {
 			currentBlock = new LineBlock(spawnX, spawnY, 0);
 			break;
 		}
+		
+		instantUpdate = true;
+
 	}
 
 	public int getUpdateTime() {
@@ -213,7 +248,7 @@ public class GameLogic {
 				}
 			}
 			try {
-				Thread.sleep(10);
+				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
