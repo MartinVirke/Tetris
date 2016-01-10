@@ -11,6 +11,7 @@ public class GameLogic {
 	private Cell[][] cellArray;
 	private int cellsInX;
 	private int cellsInY;
+	private int score;
 	private boolean isRunning, instantUpdate;
 	private int updateTime, spawnX, spawnY;
 	private float unit;
@@ -19,6 +20,7 @@ public class GameLogic {
 
 	Block currentBlock;
 	Block nextStepBlock;
+	Block nextBlock;
 
 	// private Action action;
 
@@ -37,6 +39,7 @@ public class GameLogic {
 		populateArray();
 		gameUpdate();
 		newBlock();
+		spawnBlock();
 		updateTime = 100;
 	}
 
@@ -65,7 +68,7 @@ public class GameLogic {
 							count = 0;
 						}
 					} else {
-//						moveBlock(Action.FALL);
+						// moveBlock(Action.FALL);
 						updateBlock(Action.SHOW);
 						count = 0;
 						instantUpdate = false;
@@ -190,14 +193,14 @@ public class GameLogic {
 		if (!isValidCell(0, nextStepBlock) && action != Action.DROP) {
 			activateBlockCells(currentBlock);
 			if (action == Action.FALL) {
-				newBlock();
+				spawnBlock();
 				activateBlockCells(currentBlock);
 			}
 		} else {
 			activateBlockCells(nextStepBlock);
 			currentBlock = nextStepBlock;
 			if (action == Action.DROP) {
-				newBlock();
+				spawnBlock();
 			}
 		}
 
@@ -223,32 +226,40 @@ public class GameLogic {
 		int randomInt = random.nextInt(7);
 		switch (randomInt) {
 		case 0:
-			currentBlock = new LBlock(spawnX, spawnY, 1);
+			nextBlock = new LBlock(spawnX, spawnY, 1);
 			break;
 		case 1:
-			currentBlock = new RLBlock(spawnX, spawnY, 3);
+			nextBlock = new RLBlock(spawnX, spawnY, 3);
 			break;
 		case 2:
-			currentBlock = new SBlock(spawnX, spawnY, 2);
+			nextBlock = new SBlock(spawnX, spawnY, 2);
 			break;
 		case 3:
-			currentBlock = new RSBlock(spawnX, spawnY, 2);
+			nextBlock = new RSBlock(spawnX, spawnY, 2);
 			break;
 		case 4:
-			currentBlock = new SquareBlock(spawnX, spawnY, 3);
+			nextBlock = new SquareBlock(spawnX, spawnY, 3);
 			break;
 		case 5:
-			currentBlock = new TBlock(spawnX, spawnY, 2);
+			nextBlock = new TBlock(spawnX, spawnY, 2);
 			break;
 		case 6:
-			currentBlock = new LineBlock(spawnX, spawnY, 3);
+			nextBlock = new LineBlock(spawnX, spawnY, 3);
 			break;
 		}
-			if(!isValidCell(0, currentBlock)){
-				gameOver();
-			}
-			instantUpdate = true;
-			removeLines();
+
+	}
+
+	private void spawnBlock() {
+		// newBlock();
+		currentBlock = nextBlock;
+		newBlock();
+
+		if (!isValidCell(0, currentBlock)) {
+			gameOver();
+		}
+		instantUpdate = true;
+		removeLines();
 	}
 
 	private void gameOver() {
@@ -257,6 +268,7 @@ public class GameLogic {
 
 	private void removeLines() {
 		int count = 0;
+		int linesCleared = 0;
 		for (int i = 0; i < cellsInY; i++) {
 			for (int j = 0; j < cellsInX; j++) {
 				if (!cellArray[j][i].isAlive())
@@ -266,10 +278,32 @@ public class GameLogic {
 				}
 				if (count == cellsInX) {
 					moveLinesDown(i);
+					linesCleared++;
 				}
 			}
 			count = 0;
 		}
+		addScore(linesCleared);
+	}
+
+	private void addScore(int linesCleared) {
+		switch (linesCleared) {
+		case 1:
+			score += 40;
+			break;
+		case 2:
+			score += 100;
+			break;
+		case 3:
+			score += 300;
+			break;
+		case 4:
+			score += 1200;
+			break;
+		default:
+			break;
+		}
+		System.out.println(score);
 	}
 
 	private void moveLinesDown(int startRow) {
@@ -289,17 +323,25 @@ public class GameLogic {
 		return isRunning;
 	}
 
-	public void drawGraphics(GraphicsContext gc) {
-		unit = (float) (gc.getCanvas().getWidth() / cellsInX);
+	public void drawGraphics(GraphicsContext gameGc, GraphicsContext nextBlockGc) {
+		unit = (float) (gameGc.getCanvas().getWidth() / cellsInX);
 		while (isRunning) {
-			gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
+			gameGc.clearRect(0, 0, gameGc.getCanvas().getWidth(), gameGc.getCanvas().getHeight());
 			for (int i = 0; i < cellsInY; i++) {
 				for (int j = 0; j < cellsInX; j++) {
 					if (cellArray[j][i].isAlive())
-						gc.drawImage(imageArray[cellArray[j][i].getColorId()], cellArray[j][i].getX() * unit,
+						gameGc.drawImage(imageArray[cellArray[j][i].getColorId()], cellArray[j][i].getX() * unit,
 								cellArray[j][i].getY() * unit, unit, unit);
 				}
 			}
+
+			nextBlockGc.clearRect(0, 0, nextBlockGc.getCanvas().getWidth(), nextBlockGc.getCanvas().getHeight());
+			for (int i = 0; i < 4; i++) {
+				nextBlockGc.drawImage(imageArray[nextBlock.getColor().ordinal()],
+						(nextBlock.getPattern()[nextBlock.getRot()][i] * unit) + unit,
+						(nextBlock.getPattern()[nextBlock.getYRot()][i] * unit) + unit, unit, unit);
+			}
+
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {

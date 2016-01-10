@@ -20,6 +20,8 @@ public class Controller implements Initializable {
 	BorderPane borderPane;
 	@FXML
 	Canvas canvas;
+	@FXML
+	Canvas nextBlockCanvas;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -35,7 +37,7 @@ public class Controller implements Initializable {
 		});
 		
 		Thread thread = new Thread(()->{
-			logic.drawGraphics(canvas.getGraphicsContext2D());
+			logic.drawGraphics(canvas.getGraphicsContext2D(), nextBlockCanvas.getGraphicsContext2D());
 		});
 		thread.start();
 		
