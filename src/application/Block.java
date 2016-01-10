@@ -17,7 +17,9 @@ public abstract class Block {
 		this.rot = rot;
 		this.color = color;
 		}
-		
+
+	// Polymorphism
+	public abstract Block makeCopy();
 	
 	public Color getColor() {
 		return color;
@@ -60,6 +62,5 @@ public abstract class Block {
 		return pattern;
 	}
 
-	public abstract Block makeCopy();
 
 }

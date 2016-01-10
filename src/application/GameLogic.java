@@ -5,6 +5,7 @@ import java.util.Random;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
+import javafx.scene.paint.Color;
 
 public class GameLogic {
 
@@ -325,13 +326,47 @@ public class GameLogic {
 
 	public void drawGraphics(GraphicsContext gameGc, GraphicsContext nextBlockGc) {
 		unit = (float) (gameGc.getCanvas().getWidth() / cellsInX);
+		
+		double cellsY = (double) cellsInY / 2;
+		double cellsX = (double) cellsInX / 2;
+		double sumX, sumY, totalsum;
+		
 		while (isRunning) {
 			gameGc.clearRect(0, 0, gameGc.getCanvas().getWidth(), gameGc.getCanvas().getHeight());
 			for (int i = 0; i < cellsInY; i++) {
 				for (int j = 0; j < cellsInX; j++) {
 					if (cellArray[j][i].isAlive())
-						gameGc.drawImage(imageArray[cellArray[j][i].getColorId()], cellArray[j][i].getX() * unit,
-								cellArray[j][i].getY() * unit, unit, unit);
+						gameGc.drawImage(imageArray[cellArray[j][i].getColorId()], j * unit, i * unit, unit, unit);
+					else {
+						
+						double di = (double) i;
+						double dj = (double) j;
+						
+						if (cellsY < di) {
+							di = di - cellsY;
+							sumY = cellsY - di;
+						} else if (cellsY > di) {
+							sumY = di +1;
+						}else{
+							sumY = di;
+						}
+						
+						if(cellsX < dj){
+							dj = dj - cellsX;
+							sumX = cellsX - dj;
+						}else if(cellsX > dj){
+							sumX = dj+1;
+						}else{
+							sumX = dj;
+						}
+						
+						totalsum = sumX + sumY + 3;
+						
+						gameGc.setFill(new Color( totalsum/100,  totalsum/100, totalsum / 20, 1));
+						gameGc.setStroke(Color.BLACK);
+						gameGc.fillRect(j * unit, i * unit, unit, unit);
+						gameGc.strokeRect(j * unit, i * unit, unit, unit);
+					}
 				}
 			}
 
