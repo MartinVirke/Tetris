@@ -3,6 +3,8 @@ package application;
 import java.util.Random;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Label;
+import javafx.scene.effect.Glow;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
@@ -17,7 +19,9 @@ public class GameLogic {
 	private int updateTime, spawnX, spawnY;
 	private float unit;
 	private Image[] imageArray;
+	private Label scoreLabel;
 	Thread gameThread;
+	GraphicsContext gameGc, nextBlockGc, blockGc;
 
 	Block currentBlock;
 	Block nextStepBlock;
@@ -29,13 +33,17 @@ public class GameLogic {
 		LEFT, RIGHT, ROTATE, DROP, FALL, SHOW
 	}
 
-	public GameLogic() {
+	public GameLogic(Label scoreLabel, GraphicsContext gameGc, GraphicsContext nextBlockGc, GraphicsContext blockGc) {
 		super();
 		this.cellsInX = 10;
 		this.cellsInY = 20;
 		this.cellArray = new Cell[cellsInX][cellsInY];
 		this.spawnX = 4;
 		this.spawnY = 1;
+		this.scoreLabel = scoreLabel;
+		this.gameGc = gameGc;
+		this.nextBlockGc = nextBlockGc;
+		this.blockGc = blockGc;
 		addImages();
 		populateArray();
 		gameUpdate();
@@ -304,7 +312,7 @@ public class GameLogic {
 		default:
 			break;
 		}
-		System.out.println(score);
+		scoreLabel.setText(String.valueOf(score));
 	}
 
 	private void moveLinesDown(int startRow) {
@@ -324,45 +332,58 @@ public class GameLogic {
 		return isRunning;
 	}
 
-	public void drawGraphics(GraphicsContext gameGc, GraphicsContext nextBlockGc) {
+	public void drawGraphics() {
 		unit = (float) (gameGc.getCanvas().getWidth() / cellsInX);
-		
+
+		Random random = new Random();
 		double cellsY = (double) cellsInY / 2;
 		double cellsX = (double) cellsInX / 2;
 		double sumX, sumY, totalsum;
-		
+		double di;
+		double dj;
+
 		while (isRunning) {
 			gameGc.clearRect(0, 0, gameGc.getCanvas().getWidth(), gameGc.getCanvas().getHeight());
+			nextBlockGc.clearRect(0, 0, nextBlockGc.getCanvas().getWidth(), nextBlockGc.getCanvas().getHeight());
 			for (int i = 0; i < cellsInY; i++) {
 				for (int j = 0; j < cellsInX; j++) {
-					if (cellArray[j][i].isAlive())
-						gameGc.drawImage(imageArray[cellArray[j][i].getColorId()], j * unit, i * unit, unit, unit);
-					else {
-						
-						double di = (double) i;
-						double dj = (double) j;
-						
-						if (cellsY < di) {
-							di = di - cellsY;
-							sumY = cellsY - di;
-						} else if (cellsY > di) {
-							sumY = di +1;
-						}else{
-							sumY = di;
-						}
-						
-						if(cellsX < dj){
-							dj = dj - cellsX;
-							sumX = cellsX - dj;
-						}else if(cellsX > dj){
-							sumX = dj+1;
-						}else{
-							sumX = dj;
-						}
-						
-						totalsum = sumX + sumY + 3;
-						
-						gameGc.setFill(new Color( totalsum/100,  totalsum/100, totalsum / 20, 1));
+
+					// double rand = (double) (random.nextInt(4) + 1) / 2;
+
+					di = (double) i;
+					dj = (double) j;
+
+					if (cellsY < di) {
+						di = di - cellsY;
+						sumY = cellsY - di;
+					} else if (cellsY > di) {
+						sumY = di + 1;
+					} else {
+						sumY = di;
+					}
+
+					if (cellsX < dj) {
+						dj = dj - cellsX;
+						sumX = cellsX - dj;
+					} else if (cellsX > dj) {
+						sumX = dj + 1;
+					} else {
+						sumX = dj;
+					}
+
+					totalsum = sumX + sumY + 3.0f;
+
+					if (cellArray[j][i].isAlive()) {
+						blockGc.drawImage(imageArray[cellArray[j][i].getColorId()], j * unit, i * unit, unit, unit);
+						blockGc.setFill(new Color(0, 0, 0, 1.0f - totalsum / 20));
+						blockGc.fillRect(j * unit, i * unit, unit, unit);
+						Glow glow = new Glow();
+						glow.setLevel(0.9);
+						blockGc.getCanvas().setEffect(glow);
+
+					} else {
+						// totalsum += rand;
+						gameGc.setFill(new Color(totalsum / 100, totalsum / 100, totalsum / 20, 1));
 						gameGc.setStroke(Color.BLACK);
 						gameGc.fillRect(j * unit, i * unit, unit, unit);
 						gameGc.strokeRect(j * unit, i * unit, unit, unit);
@@ -370,7 +391,6 @@ public class GameLogic {
 				}
 			}
 
-			nextBlockGc.clearRect(0, 0, nextBlockGc.getCanvas().getWidth(), nextBlockGc.getCanvas().getHeight());
 			for (int i = 0; i < 4; i++) {
 				nextBlockGc.drawImage(imageArray[nextBlock.getColor().ordinal()],
 						(nextBlock.getPattern()[nextBlock.getRot()][i] * unit) + unit,
