@@ -23,7 +23,7 @@ public class GameLogic {
 	// private Action action;
 
 	private enum Action {
-		LEFT, RIGHT, ROTATE, DROP, FALL
+		LEFT, RIGHT, ROTATE, DROP, FALL, SHOW
 	}
 
 	public GameLogic() {
@@ -32,7 +32,7 @@ public class GameLogic {
 		this.cellsInY = 20;
 		this.cellArray = new Cell[cellsInX][cellsInY];
 		this.spawnX = 4;
-		this.spawnY = 2;
+		this.spawnY = 1;
 		addImages();
 		populateArray();
 		gameUpdate();
@@ -61,11 +61,12 @@ public class GameLogic {
 						Thread.sleep(10);
 						count++;
 						if (count >= updateTime) {
-							moveBlock(Action.FALL);
+							updateBlock(Action.FALL);
 							count = 0;
 						}
 					} else {
-						moveBlock(Action.FALL);
+//						moveBlock(Action.FALL);
+						updateBlock(Action.SHOW);
 						count = 0;
 						instantUpdate = false;
 					}
@@ -91,19 +92,19 @@ public class GameLogic {
 
 		switch (code) {
 		case W:
-			moveBlock(Action.ROTATE);
+			updateBlock(Action.ROTATE);
 			break;
 		case A:
-			moveBlock(Action.LEFT);
+			updateBlock(Action.LEFT);
 			break;
 		case S:
 			updateTime = 10;
 			break;
 		case D:
-			moveBlock(Action.RIGHT);
+			updateBlock(Action.RIGHT);
 			break;
 		case SPACE:
-			moveBlock(Action.DROP);
+			updateBlock(Action.DROP);
 			break;
 		default:
 			break;
@@ -161,7 +162,7 @@ public class GameLogic {
 		return true;
 	}
 
-	private void moveBlock(Action action) {
+	private void updateBlock(Action action) {
 
 		nextStepBlock = currentBlock.makeCopy();
 		deactivateBlockCells(currentBlock);
@@ -243,8 +244,15 @@ public class GameLogic {
 			currentBlock = new LineBlock(spawnX, spawnY, 3);
 			break;
 		}
-		instantUpdate = true;
-		removeLines();
+			if(!isValidCell(0, currentBlock)){
+				gameOver();
+			}
+			instantUpdate = true;
+			removeLines();
+	}
+
+	private void gameOver() {
+		isRunning = false;
 	}
 
 	private void removeLines() {
@@ -267,11 +275,8 @@ public class GameLogic {
 	private void moveLinesDown(int startRow) {
 		for (int i = startRow; i > 0; i--) {
 			for (int j = 0; j < cellsInX; j++) {
-				// cellArray[j][i] = cellArray[j][i - 1];
-				// cellArray[j][i] = new Cell(j,i);
 				cellArray[j][i].setAlive(cellArray[j][i - 1].isAlive());
 				cellArray[j][i].setColorId(cellArray[j][i - 1].getColorId());
-				// cellArray[j][i].setY(j - 1);
 			}
 		}
 	}
