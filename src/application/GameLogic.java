@@ -49,6 +49,7 @@ public class GameLogic {
 		gameUpdate();
 		newBlock();
 		spawnBlock();
+		setBackground();
 		updateTime = 100;
 	}
 
@@ -332,78 +333,80 @@ public class GameLogic {
 		return isRunning;
 	}
 
-	public void drawGraphics() {
-		unit = (float) (gameGc.getCanvas().getWidth() / cellsInX);
-
-		Random random = new Random();
+	private void setBackground() {
 		double cellsY = (double) cellsInY / 2;
 		double cellsX = (double) cellsInX / 2;
 		double sumX, sumY, totalsum;
 		double di;
 		double dj;
+		
+		for (int i = 0; i < cellsInY; i++) {
+			for (int j = 0; j < cellsInX; j++) {
 
-		while (isRunning) {
-			gameGc.clearRect(0, 0, gameGc.getCanvas().getWidth(), gameGc.getCanvas().getHeight());
-			nextBlockGc.clearRect(0, 0, nextBlockGc.getCanvas().getWidth(), nextBlockGc.getCanvas().getHeight());
-			for (int i = 0; i < cellsInY; i++) {
-				for (int j = 0; j < cellsInX; j++) {
+				// double rand = (double) (random.nextInt(4) + 1) / 2;
 
-					// double rand = (double) (random.nextInt(4) + 1) / 2;
+				di = (double) i;
+				dj = (double) j;
 
-					di = (double) i;
-					dj = (double) j;
+//				if (cellsY < di) {
+//					di = di - cellsY;
+					sumY = di;
+//				} else if (cellsY > di) {
+//					sumY = di + 1;
+//				} else {
+//					sumY = di;
+//				}
 
-					if (cellsY < di) {
-						di = di - cellsY;
-						sumY = cellsY - di;
-					} else if (cellsY > di) {
-						sumY = di + 1;
-					} else {
-						sumY = di;
-					}
-
-					if (cellsX < dj) {
-						dj = dj - cellsX;
-						sumX = cellsX - dj;
-					} else if (cellsX > dj) {
-						sumX = dj + 1;
-					} else {
-						sumX = dj;
-					}
-
-					totalsum = sumX + sumY + 3.0f;
-
-					if (cellArray[j][i].isAlive()) {
-						blockGc.drawImage(imageArray[cellArray[j][i].getColorId()], j * unit, i * unit, unit, unit);
-						blockGc.setFill(new Color(0, 0, 0, 1.0f - totalsum / 20));
-						blockGc.fillRect(j * unit, i * unit, unit, unit);
-						Glow glow = new Glow();
-						glow.setLevel(0.9);
-						blockGc.getCanvas().setEffect(glow);
-
-					} else {
-						// totalsum += rand;
-						gameGc.setFill(new Color(totalsum / 100, totalsum / 100, totalsum / 20, 1));
-						gameGc.setStroke(Color.BLACK);
-						gameGc.fillRect(j * unit, i * unit, unit, unit);
-						gameGc.strokeRect(j * unit, i * unit, unit, unit);
-					}
+				if (cellsX < dj) {
+					dj = dj - cellsX;
+					sumX = cellsX - dj;
+				} else if (cellsX > dj) {
+					sumX = dj + 1;
+				} else {
+					sumX = dj;
 				}
-			}
 
-			for (int i = 0; i < 4; i++) {
-				nextBlockGc.drawImage(imageArray[nextBlock.getColor().ordinal()],
-						(nextBlock.getPattern()[nextBlock.getRot()][i] * unit) + unit,
-						(nextBlock.getPattern()[nextBlock.getYRot()][i] * unit) + unit, unit, unit);
+				totalsum = sumX + sumY;
+				
+				cellArray[j][i].setColors(0.15f, 0.15f, 0.8f, totalsum);
+				
+//				cellArray[j][i].setBgShade(totalsum);
+//				cellArray[j][i].setBgColor(new Color(0.2f, 0.2f, 0.5f, 1.0f - cellArray[j][i].getBgShade()));
+				
 			}
+		}
+	}
 
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+	public void drawGraphics() {
+		unit = (float) (gameGc.getCanvas().getWidth() / cellsInX);
+
+		gameGc.clearRect(0, 0, gameGc.getCanvas().getWidth(), gameGc.getCanvas().getHeight());
+		gameGc.fillRect(0, 0, gameGc.getCanvas().getWidth(), gameGc.getCanvas().getHeight());
+		blockGc.clearRect(0, 0, blockGc.getCanvas().getWidth(), blockGc.getCanvas().getHeight());
+		nextBlockGc.clearRect(0, 0, nextBlockGc.getCanvas().getWidth(), nextBlockGc.getCanvas().getHeight());
+		for (int i = 0; i < cellsInY; i++) {
+			for (int j = 0; j < cellsInX; j++) {
+				if (cellArray[j][i].isAlive()) {
+					blockGc.drawImage(imageArray[cellArray[j][i].getColorId()], j * unit, i * unit, unit, unit);
+					Glow glow = new Glow();
+					glow.setLevel(0.9);
+					blockGc.getCanvas().setEffect(glow);
+
+				} else {
+					gameGc.setStroke(Color.BLACK);
+					gameGc.strokeRect(j * unit, i * unit, unit, unit);
+					gameGc.setFill(cellArray[j][i].getBgColor());
+					gameGc.fillRect(j * unit, i * unit, unit, unit);
+				}
+				gameGc.setFill(cellArray[j][i].getBgShade());
+				gameGc.fillRect(j * unit, i * unit, unit, unit);
 			}
 		}
 
+		for (int i = 0; i < 4; i++) {
+			nextBlockGc.drawImage(imageArray[nextBlock.getColor().ordinal()],
+					(nextBlock.getPattern()[nextBlock.getRot()][i] * unit) + unit,
+					(nextBlock.getPattern()[nextBlock.getYRot()][i] * unit) + unit, unit, unit);
+		}
 	}
-
 }

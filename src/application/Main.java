@@ -3,6 +3,7 @@ package application;
 import java.net.URL;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 import javafx.scene.Parent;
@@ -21,6 +22,12 @@ public class Main extends Application {
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
 			primaryStage.show();
+
+			Controller ctrl = fxmlLoader.getController();
+			Thread thread = new Thread(()->{
+				ctrl.mainLoop();
+			});
+			thread.start();
 			
 		} catch (Exception e) {
 			e.printStackTrace();
