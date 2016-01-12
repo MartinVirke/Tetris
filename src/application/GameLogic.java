@@ -21,17 +21,20 @@ public class GameLogic {
 	private Image[] imageArray;
 	private Label scoreLabel;
 	private Glow glow;
-	Thread gameThread;
-	GraphicsContext gameGc, nextBlockGc, blockGc;
+	private GraphicsContext gameGc, nextBlockGc, blockGc;
 
-	Block currentBlock;
-	Block nextStepBlock;
-	Block nextBlock;
+	private Block currentBlock;
+	private Block nextStepBlock;
+	private Block nextBlock;
 
-	// private Action action;
-
+	private State state;
+	
 	private enum Action {
 		LEFT, RIGHT, ROTATE, DROP, FALL, SHOW
+	}
+	
+	private enum State{
+		RUNNING, PAUSED, GAMEOVER, ANIMATING, DROPPING
 	}
 
 	public GameLogic(Label scoreLabel, GraphicsContext gameGc, GraphicsContext nextBlockGc, GraphicsContext blockGc) {
@@ -314,7 +317,7 @@ public class GameLogic {
 		default:
 			break;
 		}
-		// scoreLabel.setText(String.valueOf(score));
+		scoreLabel.setText(String.valueOf(score));
 	}
 
 	private void moveLinesDown(int startRow) {
@@ -335,7 +338,6 @@ public class GameLogic {
 	}
 
 	private void setBackground() {
-		double cellsY = (double) cellsInY / 2;
 		double cellsX = (double) cellsInX / 2;
 		double sumX, sumY, totalsum;
 		double di;
@@ -398,5 +400,13 @@ public class GameLogic {
 					(nextBlock.getPattern()[nextBlock.getRot()][i] * unit) + unit,
 					(nextBlock.getPattern()[nextBlock.getYRot()][i] * unit) + unit, unit, unit);
 		}
+	}
+
+	public State getState() {
+		return state;
+	}
+
+	public void setState(State state) {
+		this.state = state;
 	}
 }
