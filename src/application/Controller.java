@@ -29,12 +29,12 @@ public class Controller implements Initializable {
 	Label scoreLabel;
 
 	GameLogic logic;
-	
+
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 
-		logic = new GameLogic(scoreLabel, gameCanvas.getGraphicsContext2D(),
-				nextBlockCanvas.getGraphicsContext2D(), blockCanvas.getGraphicsContext2D());
+		logic = new GameLogic(scoreLabel, gameCanvas.getGraphicsContext2D(), nextBlockCanvas.getGraphicsContext2D(),
+				blockCanvas.getGraphicsContext2D());
 
 		Platform.runLater(new Runnable() {
 			@Override
@@ -43,20 +43,22 @@ public class Controller implements Initializable {
 			}
 		});
 
-//		gameCanvas.
-//		BufferStrategy bstrat;
-		
+		blockCanvas.toFront();
+
+		// gameCanvas.
+		// BufferStrategy bstrat;
+
 		// nextBlockCanvas.widthProperty().bind(borderPane.widthProperty().divide(2.0f).subtract(1));
 		// nextBlockCanvas.heightProperty().bind(borderPane.heightProperty().divide(2.0f).subtract(1));
 		// blockCanvas.widthProperty().bind(borderPane.widthProperty().divide(6.0f));
 		// gameCanvas.widthProperty().bind(borderPane.widthProperty().divide(6.0f));
 
-//		Thread thread = new Thread(() -> {
-//			mainLoop();
-//
-//		});
-//		 thread.start();
-//
+		// Thread thread = new Thread(() -> {
+		// mainLoop();
+		//
+		// });
+		// thread.start();
+		//
 		// Platform.runLater(new Runnable() {
 		// @Override
 		// public void run() {
@@ -81,57 +83,98 @@ public class Controller implements Initializable {
 
 	}
 
-//	private static final int UPDATE_RATE = 60;
-//	private static final float UPDATE_PERIOD = 1000F / UPDATE_RATE;
+	// private static final int UPDATE_RATE = 60;
+	// private static final float UPDATE_PERIOD = 1000F / UPDATE_RATE;
 
-//	public void mainLoop() {
-//		boolean running = true;
-//
-//		long timeTaken;
-//		long beginTime;
-//		long timeLeft;
-//
-//		while (running) {
-//			System.out.println("running");
-//			beginTime = System.nanoTime();
-//
-//			logic.drawGraphics();
-//
-//			timeTaken = System.nanoTime() - beginTime;
-//			timeLeft = (long) (timeTaken / 16000F);
-//			if (timeLeft < UPDATE_PERIOD) {
-//				try {
-////					System.out.println(timeLeft);
-//					Thread.sleep(timeLeft + 25);
-//				} catch (InterruptedException ex) {
-//				}
-//			}
-//		}
-//	}
-	
-	public void mainLoop(){
+	// public void mainLoop() {
+	// boolean running = true;
+	//
+	// long timeTaken;
+	// long beginTime;
+	// long timeLeft;
+	//
+	// while (running) {
+	// System.out.println("running");
+	// beginTime = System.nanoTime();
+	//
+	// logic.drawGraphics();
+	//
+	// timeTaken = System.nanoTime() - beginTime;
+	// timeLeft = (long) (timeTaken / 16000F);
+	// if (timeLeft < UPDATE_PERIOD) {
+	// try {
+	//// System.out.println(timeLeft);
+	// Thread.sleep(timeLeft + 25);
+	// } catch (InterruptedException ex) {
+	// }
+	// }
+	// }
+	// }
+
+	// private float
+
+	public void testLoop() {
+
+		long lastLoop = System.nanoTime();
+		final int TARGET_FPS = 60;
+		final long OPTIMAL_TIME = 1000000000 / TARGET_FPS;
+
+	}
+
+	public void simpleLoop() {
 		boolean running = true;
-		
+		int updateTime = 30;
+		int gameCount = 0;
+		while (running ) {
+
+			if(gameCount >= updateTime){
+				logic.gameUpdate();
+				gameCount = 0;
+			}
+			logic.drawGraphics();
+			gameCount++;
+			try{
+				Thread.sleep(20);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void mainLoop() {
+
+		Thread gameLogicThread = new Thread(() -> {
+			logic.gameUpdate();
+		});
+		gameLogicThread.setName("gameLogicThread");
+		gameLogicThread.start();
+
+		boolean running = true;
+
 		long prevTime = 0;
 		long timeTaken = 0;
 		long timeLeft = 0;
-		
-		while(running){
-			
+
+		while (running) {
+
 			prevTime = System.nanoTime();
-			
+
 			logic.drawGraphics();
-			
+
 			timeTaken = System.nanoTime() - prevTime;
 			timeLeft = timeTaken / 5000L;
-			System.out.println(timeLeft);
-			
+
 			try {
+				synchronized (logic) {
+					logic.wait();
+					logic.notify();
+				}
 				Thread.sleep(timeLeft + 15);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
+
 	}
 
 }

@@ -20,6 +20,7 @@ public class GameLogic {
 	private float unit;
 	private Image[] imageArray;
 	private Label scoreLabel;
+	private Glow glow;
 	Thread gameThread;
 	GraphicsContext gameGc, nextBlockGc, blockGc;
 
@@ -44,13 +45,15 @@ public class GameLogic {
 		this.gameGc = gameGc;
 		this.nextBlockGc = nextBlockGc;
 		this.blockGc = blockGc;
+		glow = new Glow();
+		glow.setLevel(0.9);
 		addImages();
 		populateArray();
-		gameUpdate();
+		// gameUpdate();
 		newBlock();
 		spawnBlock();
 		setBackground();
-		updateTime = 100;
+		updateTime = 60;
 	}
 
 	private void addImages() {
@@ -64,33 +67,31 @@ public class GameLogic {
 		imageArray[6] = new Image("Image/yellow.jpg");
 	}
 
-	private void gameUpdate() {
-		gameThread = new Thread(() -> {
-			isRunning = true;
-			int count = 0;
-			while (isRunning) {
-				try {
-					if (!instantUpdate) {
-						Thread.sleep(10);
-						count++;
-						if (count >= updateTime) {
-							updateBlock(Action.FALL);
-							count = 0;
-						}
-					} else {
-						// moveBlock(Action.FALL);
-						updateBlock(Action.SHOW);
-						count = 0;
-						instantUpdate = false;
-					}
+	public synchronized void gameUpdate() {
+		isRunning = true;
+		// int count = 0;
+		// while (isRunning) {
+		// try {
+		// if (!instantUpdate) {
+		// Thread.sleep(20);
+		// count++;
+		// if (count >= updateTime) {
+		updateBlock(Action.FALL);
+		// count = 0;
+		// }
+		// } else {
+		// updateBlock(Action.SHOW);
+		// count = 0;
+		// instantUpdate = false;
+		// }
 
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
+		// } catch (InterruptedException e) {
+		// e.printStackTrace();
+		// }
+		// }
 
-		});
-		gameThread.start();
+		// });
+		// gameThread.start();
 	}
 
 	private void populateArray() {
@@ -268,7 +269,7 @@ public class GameLogic {
 		if (!isValidCell(0, currentBlock)) {
 			gameOver();
 		}
-		instantUpdate = true;
+		// instantUpdate = true;
 		removeLines();
 	}
 
@@ -313,14 +314,14 @@ public class GameLogic {
 		default:
 			break;
 		}
-		scoreLabel.setText(String.valueOf(score));
+		// scoreLabel.setText(String.valueOf(score));
 	}
 
 	private void moveLinesDown(int startRow) {
 		for (int i = startRow; i > 0; i--) {
 			for (int j = 0; j < cellsInX; j++) {
 				cellArray[j][i].setAlive(cellArray[j][i - 1].isAlive());
-				cellArray[j][i].setColorId(cellArray[j][i - 1].getColorId());
+				cellArray[j][i].setColorId(cellArray[j][i - 1].getImageId());
 			}
 		}
 	}
@@ -339,23 +340,21 @@ public class GameLogic {
 		double sumX, sumY, totalsum;
 		double di;
 		double dj;
+
+		blockGc.getCanvas().setEffect(glow);
+		nextBlockGc.getCanvas().setEffect(glow);
 		
+		unit = (float) (gameGc.getCanvas().getWidth() / cellsInX);
+		gameGc.setStroke(Color.BLACK);
+
 		for (int i = 0; i < cellsInY; i++) {
 			for (int j = 0; j < cellsInX; j++) {
 
-				// double rand = (double) (random.nextInt(4) + 1) / 2;
+				Cell cell = cellArray[j][i];
 
 				di = (double) i;
 				dj = (double) j;
-
-//				if (cellsY < di) {
-//					di = di - cellsY;
-					sumY = di;
-//				} else if (cellsY > di) {
-//					sumY = di + 1;
-//				} else {
-//					sumY = di;
-//				}
+				sumY = di;
 
 				if (cellsX < dj) {
 					dj = dj - cellsX;
@@ -367,39 +366,30 @@ public class GameLogic {
 				}
 
 				totalsum = sumX + sumY;
-				
+
 				cellArray[j][i].setColors(0.15f, 0.15f, 0.8f, totalsum);
-				
-//				cellArray[j][i].setBgShade(totalsum);
-//				cellArray[j][i].setBgColor(new Color(0.2f, 0.2f, 0.5f, 1.0f - cellArray[j][i].getBgShade()));
-				
+				cell.setColors(0.15f, 0.15f, 0.8f, totalsum);
+
+				gameGc.strokeRect(j * unit, i * unit, unit, unit);
+				gameGc.setFill(cell.getBgColor());
+				gameGc.fillRect(j * unit, i * unit, unit, unit);
+				gameGc.setFill(cell.getBgShade());
+				gameGc.fillRect(j * unit, i * unit, unit, unit);
 			}
 		}
 	}
 
 	public void drawGraphics() {
-		unit = (float) (gameGc.getCanvas().getWidth() / cellsInX);
 
-		gameGc.clearRect(0, 0, gameGc.getCanvas().getWidth(), gameGc.getCanvas().getHeight());
-		gameGc.fillRect(0, 0, gameGc.getCanvas().getWidth(), gameGc.getCanvas().getHeight());
 		blockGc.clearRect(0, 0, blockGc.getCanvas().getWidth(), blockGc.getCanvas().getHeight());
 		nextBlockGc.clearRect(0, 0, nextBlockGc.getCanvas().getWidth(), nextBlockGc.getCanvas().getHeight());
 		for (int i = 0; i < cellsInY; i++) {
 			for (int j = 0; j < cellsInX; j++) {
 				if (cellArray[j][i].isAlive()) {
-					blockGc.drawImage(imageArray[cellArray[j][i].getColorId()], j * unit, i * unit, unit, unit);
-					Glow glow = new Glow();
-					glow.setLevel(0.9);
-					blockGc.getCanvas().setEffect(glow);
-
-				} else {
-					gameGc.setStroke(Color.BLACK);
-					gameGc.strokeRect(j * unit, i * unit, unit, unit);
-					gameGc.setFill(cellArray[j][i].getBgColor());
-					gameGc.fillRect(j * unit, i * unit, unit, unit);
+					blockGc.drawImage(imageArray[cellArray[j][i].getImageId()], j * unit, i * unit, unit, unit);
+					blockGc.setFill(cellArray[j][i].getBgShade());
+					blockGc.fillRect(j * unit, i * unit, unit, unit);
 				}
-				gameGc.setFill(cellArray[j][i].getBgShade());
-				gameGc.fillRect(j * unit, i * unit, unit, unit);
 			}
 		}
 

@@ -63,7 +63,7 @@ public class Cell {
 		return y;
 	}
 
-	public int getColorId() {
+	public int getImageId() {
 		return imageId;
 	}
 

@@ -24,10 +24,11 @@ public class Main extends Application {
 			primaryStage.show();
 
 			Controller ctrl = fxmlLoader.getController();
-			Thread thread = new Thread(()->{
-				ctrl.mainLoop();
+			Thread graphicsThread = new Thread(()->{
+				ctrl.simpleLoop();
 			});
-			thread.start();
+			graphicsThread.setName("graphicsThread");
+			graphicsThread.start();
 			
 		} catch (Exception e) {
 			e.printStackTrace();
