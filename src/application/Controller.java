@@ -4,7 +4,6 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import javafx.application.Platform;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
@@ -18,8 +17,6 @@ public class Controller implements Initializable {
 	BorderPane borderPane;
 	@FXML
 	Canvas gameCanvas;
-	// @FXML
-	// Canvas blockCanvas;
 	@FXML
 	Canvas nextBlockCanvas;
 	@FXML
@@ -32,7 +29,6 @@ public class Controller implements Initializable {
 	GameLogic logic;
 
 	GraphicsContext blockGc;
-	// Canvas blockCanvas;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -49,14 +45,18 @@ public class Controller implements Initializable {
 //		scoreLabel.textProperty().bind(logic.getScore());
 		
 		scoreLabel.setText(logic.getScore().getValue());
+		
 		logic.getScore().addListener((observable, newvalue, oldvalue) -> {
-			Platform.runLater(new Runnable() {
-				@Override
-				public void run() {
-					System.out.println(observable.getValue());
+//			Platform.runLater(new Runnable() {
+//				@Override
+//				public void run() {
+//					scoreLabel.setText(observable.getValue());
+//				}
+//			});
+			Platform.runLater(()->{
 					scoreLabel.setText(observable.getValue());
-				}
 			});
+			
 		});
 
 		// blockCanvas.setVisible(false);

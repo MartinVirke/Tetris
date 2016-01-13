@@ -56,27 +56,8 @@ public class GameLogic {
 		newBlock();
 		spawnBlock();
 		setBackground();
+		state = State.RUNNING;
 		updateTime = 60;
-
-		test();
-
-	}
-
-	private void test() {
-		Thread thread = new Thread(() -> {
-			while (true) {
-				keyPressed(KeyCode.A);
-				try {
-//					Thread.sleep(1);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				keyPressed(KeyCode.D);
-//				keyPressed(KeyCode.RIGHT);
-			}
-		});
-		thread.start();
 	}
 
 	private void addImages() {
@@ -109,7 +90,9 @@ public class GameLogic {
 		// Thread.sleep(20);
 		// count++;
 		// if (count >= updateTime) {
-		updateBlock(Action.FALL);
+		if (state != State.DROPPING) {
+			updateBlock(Action.FALL);
+		}
 		// count = 0;
 		// }
 		// } else {
@@ -136,27 +119,56 @@ public class GameLogic {
 	}
 
 	public synchronized void keyPressed(KeyCode code) {
+		if (state == State.RUNNING)
+			switch (code) {
+			case W:
+				updateBlock(Action.ROTATE);
+				break;
+			case A:
+				updateBlock(Action.LEFT);
+				break;
+			case S:
+				updateTime = 10;
+				break;
+			case D:
+				updateBlock(Action.RIGHT);
+				break;
+			case SPACE:
+				dropBlock();
+				break;
+			default:
+				break;
+			}
 
-		switch (code) {
-		case W:
-			updateBlock(Action.ROTATE);
-			break;
-		case A:
-			updateBlock(Action.LEFT);
-			break;
-		case S:
-			updateTime = 10;
-			break;
-		case D:
-			updateBlock(Action.RIGHT);
-			break;
-		case SPACE:
-			updateBlock(Action.DROP);
-			break;
-		default:
-			break;
-		}
+	}
 
+	private void dropBlock() {
+		state = State.DROPPING;
+		nextStepBlock = currentBlock.makeCopy();
+		deactivateBlockCells(currentBlock);
+		int highPoint = nextStepBlock.getY();
+		nextStepBlock.setY(findLowpoint(nextStepBlock));
+		int lowPoint = nextStepBlock.getY();
+		Block tmpBlock = nextStepBlock.makeCopy();
+		Thread tmpThread = new Thread(() -> {
+			for (int i = highPoint; i < lowPoint; i++) {
+				tmpBlock.setY(i);
+				activateBlockCells(tmpBlock);
+				try {
+					Thread.sleep(5);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				deactivateBlockCells(tmpBlock);
+			}
+			activateBlockCells(nextStepBlock);
+			currentBlock = nextStepBlock;
+			spawnBlock();
+			state = State.RUNNING;
+		});
+		tmpThread.start();
+
+		// updateBlock(Action.DROP);
 	}
 
 	public synchronized void keyReleased(KeyCode code) {
@@ -189,7 +201,6 @@ public class GameLogic {
 	private void deactivateBlockCells(Block block) {
 		for (int i = 0; i < 4; i++) {
 			cellArray[getCellX(i, block)][getCellY(i, block)].setAlive(false);
-			;
 		}
 	}
 
@@ -224,9 +235,6 @@ public class GameLogic {
 		case RIGHT:
 			nextStepBlock.setX(nextStepBlock.getX() + 1);
 			break;
-		case DROP:
-			nextStepBlock.setY(findLowpoint(nextStepBlock));
-			break;
 		case FALL:
 			nextStepBlock.setY(nextStepBlock.getY() + 1);
 			break;
@@ -234,7 +242,7 @@ public class GameLogic {
 			break;
 		}
 
-		if (!isValidCell(0, nextStepBlock) && action != Action.DROP) {
+		if (!isValidCell(0, nextStepBlock)) {
 			activateBlockCells(currentBlock);
 			if (action == Action.FALL) {
 				spawnBlock();
@@ -243,9 +251,6 @@ public class GameLogic {
 		} else {
 			activateBlockCells(nextStepBlock);
 			currentBlock = nextStepBlock;
-			if (action == Action.DROP) {
-				spawnBlock();
-			}
 		}
 
 	}
@@ -309,7 +314,6 @@ public class GameLogic {
 	}
 
 	private void addScore(int linesCleared) {
-		System.out.println("here");
 		int oldValue = Integer.parseInt(score.getValue());
 		switch (linesCleared) {
 		case 1:
