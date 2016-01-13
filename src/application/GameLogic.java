@@ -144,22 +144,21 @@ public class GameLogic {
 
 	private void dropBlock() {
 		state = State.DROPPING;
+		
 		nextStepBlock = currentBlock.makeCopy();
 		deactivateBlockCells(currentBlock);
-		int highPoint = nextStepBlock.getY();
 		nextStepBlock.setY(findLowpoint(nextStepBlock));
 		int lowPoint = nextStepBlock.getY();
-		Block tmpBlock = nextStepBlock.makeCopy();
 		Thread tmpThread = new Thread(() -> {
-			for (int i = highPoint; i < lowPoint; i++) {
-				tmpBlock.setY(i);
-				activateBlockCells(tmpBlock);
+			for (int i = currentBlock.getY(); i <= lowPoint; i++) {
+				deactivateBlockCells(nextStepBlock);
+				nextStepBlock.setY(i);
+				activateBlockCells(nextStepBlock);
 				try {
 					Thread.sleep(5);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				deactivateBlockCells(tmpBlock);
 			}
 			activateBlockCells(nextStepBlock);
 			currentBlock = nextStepBlock;
@@ -167,8 +166,6 @@ public class GameLogic {
 			state = State.RUNNING;
 		});
 		tmpThread.start();
-
-		// updateBlock(Action.DROP);
 	}
 
 	public synchronized void keyReleased(KeyCode code) {
@@ -393,8 +390,8 @@ public class GameLogic {
 		}
 	}
 
+	
 	public void drawGraphics(GraphicsContext blockGc) {
-
 		blockGc.getCanvas().setEffect(glow);
 		blockGc.clearRect(0, 0, blockGc.getCanvas().getWidth(), blockGc.getCanvas().getHeight());
 		nextBlockGc.clearRect(0, 0, nextBlockGc.getCanvas().getWidth(), nextBlockGc.getCanvas().getHeight());
