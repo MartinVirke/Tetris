@@ -4,9 +4,11 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 
@@ -16,20 +18,26 @@ public class Controller implements Initializable {
 	BorderPane borderPane;
 	@FXML
 	Canvas gameCanvas;
-	@FXML
-	Canvas blockCanvas;
+	// @FXML
+	// Canvas blockCanvas;
 	@FXML
 	Canvas nextBlockCanvas;
+	@FXML
+	Canvas bufferCanvas1;
+	@FXML
+	Canvas bufferCanvas2;
 	@FXML
 	Label scoreLabel;
 
 	GameLogic logic;
 
+	GraphicsContext blockGc;
+	// Canvas blockCanvas;
+
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 
-		logic = new GameLogic(scoreLabel, gameCanvas.getGraphicsContext2D(), nextBlockCanvas.getGraphicsContext2D(),
-				blockCanvas.getGraphicsContext2D());
+		logic = new GameLogic(scoreLabel, gameCanvas.getGraphicsContext2D(), nextBlockCanvas.getGraphicsContext2D());
 
 		Platform.runLater(new Runnable() {
 			@Override
@@ -38,7 +46,24 @@ public class Controller implements Initializable {
 			}
 		});
 
-		blockCanvas.toFront();
+//		scoreLabel.textProperty().bind(logic.getScore());
+		
+		scoreLabel.setText(logic.getScore().getValue());
+		logic.getScore().addListener((observable, newvalue, oldvalue) -> {
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					System.out.println(observable.getValue());
+					scoreLabel.setText(observable.getValue());
+				}
+			});
+		});
+
+		// blockCanvas.setVisible(false);
+		// blockCanvas = bufferCanvas1;
+		blockGc = bufferCanvas1.getGraphicsContext2D();
+		bufferCanvas2.toFront();
+		bufferCanvas1.toFront();
 
 		// gameCanvas.
 		// BufferStrategy bstrat;
@@ -110,17 +135,32 @@ public class Controller implements Initializable {
 
 	public void simpleLoop() {
 		boolean running = true;
-		int updateTime = 30;
+		boolean toggle = false;
+		int updateTime = 20;
 		int gameCount = 0;
-		while (running ) {
+		while (running) {
 
-			if(gameCount >= updateTime){
+			if (gameCount >= updateTime) {
 				logic.gameUpdate();
 				gameCount = 0;
 			}
-			logic.drawGraphics();
+
+			if (toggle) {
+				bufferCanvas1.setVisible(true);
+				bufferCanvas2.setVisible(false);
+				blockGc = bufferCanvas2.getGraphicsContext2D();
+				toggle = false;
+			} else {
+				bufferCanvas2.setVisible(true);
+				bufferCanvas1.setVisible(false);
+				blockGc = bufferCanvas1.getGraphicsContext2D();
+				toggle = true;
+			}
+
+			logic.drawGraphics(blockGc);
+
 			gameCount++;
-			try{
+			try {
 				Thread.sleep(20);
 			} catch (InterruptedException e) {
 				e.printStackTrace();

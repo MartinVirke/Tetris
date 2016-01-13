@@ -25,6 +25,8 @@
    <center>
       <StackPane prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
+            <Canvas fx:id="bufferCanvas1" height="500.0" width="250.0" />
+            <Canvas fx:id="bufferCanvas2" height="500.0" width="250.0" />
             <Canvas fx:id="blockCanvas" height="500.0" width="250.0" />
             <Canvas fx:id="gameCanvas" height="500.0" width="250.0" />
          </children>

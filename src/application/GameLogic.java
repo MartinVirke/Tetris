@@ -2,6 +2,7 @@ package application;
 
 import java.util.Random;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.effect.Glow;
@@ -14,49 +15,68 @@ public class GameLogic {
 	private Cell[][] cellArray;
 	private int cellsInX;
 	private int cellsInY;
-	private int score;
-	private boolean isRunning, instantUpdate;
+	// private int score;
+	private SimpleStringProperty score;
 	private int updateTime, spawnX, spawnY;
 	private float unit;
 	private Image[] imageArray;
-	private Label scoreLabel;
+	private Block[] blockArray;
 	private Glow glow;
-	private GraphicsContext gameGc, nextBlockGc, blockGc;
+	private GraphicsContext gameGc, nextBlockGc;
 
 	private Block currentBlock;
 	private Block nextStepBlock;
 	private Block nextBlock;
 
 	private State state;
-	
+
 	private enum Action {
 		LEFT, RIGHT, ROTATE, DROP, FALL, SHOW
 	}
-	
-	private enum State{
+
+	private enum State {
 		RUNNING, PAUSED, GAMEOVER, ANIMATING, DROPPING
 	}
 
-	public GameLogic(Label scoreLabel, GraphicsContext gameGc, GraphicsContext nextBlockGc, GraphicsContext blockGc) {
+	public GameLogic(Label scoreLabel, GraphicsContext gameGc, GraphicsContext nextBlockGc) {
 		super();
 		this.cellsInX = 10;
 		this.cellsInY = 20;
 		this.cellArray = new Cell[cellsInX][cellsInY];
 		this.spawnX = 4;
 		this.spawnY = 1;
-		this.scoreLabel = scoreLabel;
 		this.gameGc = gameGc;
 		this.nextBlockGc = nextBlockGc;
-		this.blockGc = blockGc;
+		score = new SimpleStringProperty("0");
 		glow = new Glow();
 		glow.setLevel(0.9);
 		addImages();
+		addBlocks();
 		populateArray();
-		// gameUpdate();
 		newBlock();
 		spawnBlock();
 		setBackground();
 		updateTime = 60;
+
+		test();
+
+	}
+
+	private void test() {
+		Thread thread = new Thread(() -> {
+			while (true) {
+				keyPressed(KeyCode.A);
+				try {
+//					Thread.sleep(1);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				keyPressed(KeyCode.D);
+//				keyPressed(KeyCode.RIGHT);
+			}
+		});
+		thread.start();
 	}
 
 	private void addImages() {
@@ -70,8 +90,18 @@ public class GameLogic {
 		imageArray[6] = new Image("Image/yellow.jpg");
 	}
 
+	private void addBlocks() {
+		blockArray = new Block[7];
+		blockArray[0] = new LBlock(spawnX, spawnY, 1);
+		blockArray[1] = new RLBlock(spawnX, spawnY, 3);
+		blockArray[2] = new SBlock(spawnX, spawnY, 2);
+		blockArray[3] = new RSBlock(spawnX, spawnY, 2);
+		blockArray[4] = new SquareBlock(spawnX, spawnY, 3);
+		blockArray[5] = new TBlock(spawnX, spawnY, 2);
+		blockArray[6] = new LineBlock(spawnX, spawnY, 3);
+	}
+
 	public synchronized void gameUpdate() {
-		isRunning = true;
 		// int count = 0;
 		// while (isRunning) {
 		// try {
@@ -105,7 +135,7 @@ public class GameLogic {
 		}
 	}
 
-	public void keyPressed(KeyCode code) {
+	public synchronized void keyPressed(KeyCode code) {
 
 		switch (code) {
 		case W:
@@ -129,7 +159,7 @@ public class GameLogic {
 
 	}
 
-	public void keyReleased(KeyCode code) {
+	public synchronized void keyReleased(KeyCode code) {
 		switch (code) {
 		case S:
 			updateTime = 100;
@@ -238,30 +268,7 @@ public class GameLogic {
 	private void newBlock() {
 		Random random = new Random();
 		int randomInt = random.nextInt(7);
-		switch (randomInt) {
-		case 0:
-			nextBlock = new LBlock(spawnX, spawnY, 1);
-			break;
-		case 1:
-			nextBlock = new RLBlock(spawnX, spawnY, 3);
-			break;
-		case 2:
-			nextBlock = new SBlock(spawnX, spawnY, 2);
-			break;
-		case 3:
-			nextBlock = new RSBlock(spawnX, spawnY, 2);
-			break;
-		case 4:
-			nextBlock = new SquareBlock(spawnX, spawnY, 3);
-			break;
-		case 5:
-			nextBlock = new TBlock(spawnX, spawnY, 2);
-			break;
-		case 6:
-			nextBlock = new LineBlock(spawnX, spawnY, 3);
-			break;
-		}
-
+		nextBlock = blockArray[randomInt];
 	}
 
 	private void spawnBlock() {
@@ -277,7 +284,7 @@ public class GameLogic {
 	}
 
 	private void gameOver() {
-		isRunning = false;
+		state = State.GAMEOVER;
 	}
 
 	private void removeLines() {
@@ -297,27 +304,33 @@ public class GameLogic {
 			}
 			count = 0;
 		}
-		addScore(linesCleared);
+		if (linesCleared > 0)
+			addScore(linesCleared);
 	}
 
 	private void addScore(int linesCleared) {
+		System.out.println("here");
+		int oldValue = Integer.parseInt(score.getValue());
 		switch (linesCleared) {
 		case 1:
-			score += 40;
+			// score += 40;
+			score.setValue(String.valueOf(oldValue + 40));
 			break;
 		case 2:
-			score += 100;
+			score.setValue(String.valueOf(oldValue + 100));
+			// score += 100;
 			break;
 		case 3:
-			score += 300;
+			score.setValue(String.valueOf(oldValue + 300));
+			// score += 300;
 			break;
 		case 4:
-			score += 1200;
+			score.setValue(String.valueOf(oldValue + 1200));
+			// score += 1200;
 			break;
 		default:
 			break;
 		}
-		scoreLabel.setText(String.valueOf(score));
 	}
 
 	private void moveLinesDown(int startRow) {
@@ -333,19 +346,14 @@ public class GameLogic {
 		return updateTime;
 	}
 
-	public boolean isRunning() {
-		return isRunning;
-	}
-
 	private void setBackground() {
 		double cellsX = (double) cellsInX / 2;
 		double sumX, sumY, totalsum;
 		double di;
 		double dj;
 
-		blockGc.getCanvas().setEffect(glow);
 		nextBlockGc.getCanvas().setEffect(glow);
-		
+
 		unit = (float) (gameGc.getCanvas().getWidth() / cellsInX);
 		gameGc.setStroke(Color.BLACK);
 
@@ -381,8 +389,9 @@ public class GameLogic {
 		}
 	}
 
-	public void drawGraphics() {
+	public void drawGraphics(GraphicsContext blockGc) {
 
+		blockGc.getCanvas().setEffect(glow);
 		blockGc.clearRect(0, 0, blockGc.getCanvas().getWidth(), blockGc.getCanvas().getHeight());
 		nextBlockGc.clearRect(0, 0, nextBlockGc.getCanvas().getWidth(), nextBlockGc.getCanvas().getHeight());
 		for (int i = 0; i < cellsInY; i++) {
@@ -408,5 +417,9 @@ public class GameLogic {
 
 	public void setState(State state) {
 		this.state = state;
+	}
+
+	public SimpleStringProperty getScore() {
+		return score;
 	}
 }
