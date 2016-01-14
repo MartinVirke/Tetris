@@ -42,6 +42,8 @@ public class Controller implements Initializable {
 
 	private GraphicsContext blockGc;
 
+	private ReadWriteHandler rwHandler;
+
 	private boolean running;
 
 	@Override
@@ -49,6 +51,7 @@ public class Controller implements Initializable {
 
 		logic = new GameLogic(scoreLabel, pauseMenu, bgCanvas.getGraphicsContext2D(),
 				nextBlockCanvas.getGraphicsContext2D());
+		rwHandler = new ReadWriteHandler();
 
 		Platform.runLater(() -> {
 			rootPane.requestFocus();
@@ -70,11 +73,11 @@ public class Controller implements Initializable {
 		});
 
 		loadBtn.setOnAction(event -> {
-
+			logic = (GameLogic) rwHandler.loadFile();
 		});
 
 		saveBtn.setOnAction(event -> {
-
+			rwHandler.saveFile(logic);
 		});
 
 		highscoresBtn.setOnAction(event -> {
@@ -111,19 +114,20 @@ public class Controller implements Initializable {
 		int updateTime = 20;
 		int gameCount = 0;
 		while (running) {
+			if (logic.getState() == State.RUNNING) {
+				if (gameCount >= updateTime) {
+					logic.gameUpdate();
+					gameCount = 0;
+				}
 
-			if (gameCount >= updateTime) {
-				logic.gameUpdate();
-				gameCount = 0;
-			}
+				logic.drawGraphics(blockGc);
 
-			logic.drawGraphics(blockGc);
-
-			gameCount++;
-			try {
-				Thread.sleep(20);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+				gameCount++;
+				try {
+					Thread.sleep(20);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}

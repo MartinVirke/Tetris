@@ -1,9 +1,9 @@
 package application;
 
+import java.io.Serializable;
 import java.util.Random;
 
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.effect.Glow;
@@ -12,40 +12,33 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
-public class GameLogic {
 
-	private Cell[][] cellArray;
+public class GameLogic implements Serializable {
+
 	private int cellsInX;
 	private int cellsInY;
-	// private int score;
-	private SimpleStringProperty score;
 	private int updateTime, spawnX, spawnY;
 	private float unit;
-	private Image[] imageArray;
-	private Block[] blockArray;
-	private Glow glow;
-	private GraphicsContext gameGc, nextBlockGc;
-	private VBox pauseMenu;
-
-	private SaveLoad saveLoad;
-
+	
 	private Block currentBlock;
 	private Block nextStepBlock;
 	private Block nextBlock;
-
+	private Block[] blockArray;
 	private State state;
+	
+	private transient SimpleStringProperty score;
+	private transient Glow glow;
+	private transient GraphicsContext gameGc, nextBlockGc;
+	private transient VBox pauseMenu;
+	private transient Cell[][] cellArray;
+	private transient Image[] imageArray;
 
 	private enum Action {
 		LEFT, RIGHT, ROTATE, DROP, FALL, SHOW
 	}
 
-	private enum State {
-		RUNNING, PAUSED, GAMEOVER, ANIMATING, DROPPING
-	}
-
 	public GameLogic(Label scoreLabel, VBox pauseMenu, GraphicsContext bgGc, GraphicsContext nextBlockGc) {
 		super();
-		saveLoad = new SaveLoad();
 		this.cellsInX = 10;
 		this.cellsInY = 20;
 		this.cellArray = new Cell[cellsInX][cellsInY];
@@ -90,31 +83,9 @@ public class GameLogic {
 	}
 
 	public synchronized void gameUpdate() {
-		// int count = 0;
-		// while (isRunning) {
-		// try {
-		// if (!instantUpdate) {
-		// Thread.sleep(20);
-		// count++;
-		// if (count >= updateTime) {
 		if (state == State.RUNNING) {
 			updateBlock(Action.FALL);
 		}
-		// count = 0;
-		// }
-		// } else {
-		// updateBlock(Action.SHOW);
-		// count = 0;
-		// instantUpdate = false;
-		// }
-
-		// } catch (InterruptedException e) {
-		// e.printStackTrace();
-		// }
-		// }
-
-		// });
-		// gameThread.start();
 	}
 
 	private void populateArray() {

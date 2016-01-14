@@ -1,6 +1,8 @@
 package application;
 
-public abstract class Block {
+import java.io.Serializable;
+
+public abstract class Block implements Serializable{
 
 	private int x, y, rot;
 	protected int[][] pattern;
