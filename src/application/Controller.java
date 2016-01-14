@@ -8,134 +8,106 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 
 public class Controller implements Initializable {
 
 	@FXML
-	BorderPane borderPane;
+	private Pane rootPane;
 	@FXML
-	Canvas gameCanvas;
+	private Canvas bgCanvas;
 	@FXML
-	Canvas nextBlockCanvas;
+	private Canvas nextBlockCanvas;
 	@FXML
-	Canvas bufferCanvas1;
+	private Canvas bufferCanvas1;
 	@FXML
-	Canvas bufferCanvas2;
+	private Canvas bufferCanvas2;
 	@FXML
-	Label scoreLabel;
+	private Label scoreLabel;
+	@FXML
+	private VBox vBox1, pauseMenu;
+	@FXML
+	private HBox hBox1;
+	@FXML
+	private Button resumeBtn, loadBtn, saveBtn, highscoresBtn, exitBtn;
 
-	GameLogic logic;
+	private GameLogic logic;
 
-	GraphicsContext blockGc;
+	private GraphicsContext blockGc;
+
+	private boolean running;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 
-		logic = new GameLogic(scoreLabel, gameCanvas.getGraphicsContext2D(), nextBlockCanvas.getGraphicsContext2D());
+		logic = new GameLogic(scoreLabel, pauseMenu, bgCanvas.getGraphicsContext2D(),
+				nextBlockCanvas.getGraphicsContext2D());
 
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				borderPane.requestFocus();
-			}
+		Platform.runLater(() -> {
+			rootPane.requestFocus();
 		});
 
-//		scoreLabel.textProperty().bind(logic.getScore());
-		
-		scoreLabel.setText(logic.getScore().getValue());
-		
-		logic.getScore().addListener((observable, newvalue, oldvalue) -> {
-//			Platform.runLater(new Runnable() {
-//				@Override
-//				public void run() {
-//					scoreLabel.setText(observable.getValue());
-//				}
-//			});
-			Platform.runLater(()->{
-					scoreLabel.setText(observable.getValue());
+		rootPane.focusedProperty().addListener((observable, newvalue, oldvalue) -> {
+			Platform.runLater(() -> {
+				rootPane.requestFocus();
 			});
-			
 		});
 
-		// blockCanvas.setVisible(false);
-		// blockCanvas = bufferCanvas1;
+		scoreLabel.setText(logic.getScore().getValue());
+
+		rootPane.setBackground(new Background(new BackgroundFill(new Color(0.0, 0.0, 0.09, 1), null, null)));
+
+		resumeBtn.setOnAction(event -> {
+			logic.togglePause();
+			logic.toggleShowMenu();
+		});
+
+		loadBtn.setOnAction(event -> {
+
+		});
+
+		saveBtn.setOnAction(event -> {
+
+		});
+
+		highscoresBtn.setOnAction(event -> {
+
+		});
+
+		exitBtn.setOnAction(event -> {
+			running = false;
+			Platform.exit();
+		});
+
+		logic.getScore().addListener((observable, newvalue, oldvalue) -> {
+			Platform.runLater(() -> {
+				scoreLabel.setText(observable.getValue());
+			});
+		});
+
 		blockGc = bufferCanvas1.getGraphicsContext2D();
 		bufferCanvas2.toFront();
 		bufferCanvas1.toFront();
 
-		// gameCanvas.
-		// BufferStrategy bstrat;
-
-		// nextBlockCanvas.widthProperty().bind(borderPane.widthProperty().divide(2.0f).subtract(1));
-		// nextBlockCanvas.heightProperty().bind(borderPane.heightProperty().divide(2.0f).subtract(1));
-		// blockCanvas.widthProperty().bind(borderPane.widthProperty().divide(6.0f));
-		// gameCanvas.widthProperty().bind(borderPane.widthProperty().divide(6.0f));
-
-		// Thread thread = new Thread(() -> {
-		// mainLoop();
-		//
-		// });
-		// thread.start();
-		//
-		// Platform.runLater(new Runnable() {
-		// @Override
-		// public void run() {
-		// while (logic.isRunning()){
-		// try {
-		// Thread.sleep(logic.getUpdateTime());
-		// } catch (InterruptedException e) {
-		// e.printStackTrace();
-		// }
-		// logic.updateLogic();
-		// }
-		// }
-		// });
-
-		borderPane.setOnKeyPressed(event -> {
+		rootPane.setOnKeyPressed(event -> {
 			logic.keyPressed(event.getCode());
 		});
 
-		borderPane.setOnKeyReleased(event -> {
+		rootPane.setOnKeyReleased(event -> {
 			logic.keyReleased(event.getCode());
 		});
 
 	}
 
-	// private static final int UPDATE_RATE = 60;
-	// private static final float UPDATE_PERIOD = 1000F / UPDATE_RATE;
-
-	// public void mainLoop() {
-	// boolean running = true;
-	//
-	// long timeTaken;
-	// long beginTime;
-	// long timeLeft;
-	//
-	// while (running) {
-	// System.out.println("running");
-	// beginTime = System.nanoTime();
-	//
-	// logic.drawGraphics();
-	//
-	// timeTaken = System.nanoTime() - beginTime;
-	// timeLeft = (long) (timeTaken / 16000F);
-	// if (timeLeft < UPDATE_PERIOD) {
-	// try {
-	//// System.out.println(timeLeft);
-	// Thread.sleep(timeLeft + 25);
-	// } catch (InterruptedException ex) {
-	// }
-	// }
-	// }
-	// }
-
-	// private float
-
 	public void simpleLoop() {
-		boolean running = true;
-		boolean toggle = false;
+		running = true;
 		int updateTime = 20;
 		int gameCount = 0;
 		while (running) {
@@ -143,18 +115,6 @@ public class Controller implements Initializable {
 			if (gameCount >= updateTime) {
 				logic.gameUpdate();
 				gameCount = 0;
-			}
-
-			if (toggle) {
-				bufferCanvas1.setVisible(true);
-				bufferCanvas2.setVisible(false);
-				blockGc = bufferCanvas2.getGraphicsContext2D();
-				toggle = false;
-			} else {
-				bufferCanvas2.setVisible(true);
-				bufferCanvas1.setVisible(false);
-				blockGc = bufferCanvas1.getGraphicsContext2D();
-				toggle = true;
 			}
 
 			logic.drawGraphics(blockGc);

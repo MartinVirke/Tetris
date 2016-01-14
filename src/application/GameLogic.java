@@ -3,11 +3,13 @@ package application;
 import java.util.Random;
 
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.effect.Glow;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 public class GameLogic {
@@ -23,6 +25,9 @@ public class GameLogic {
 	private Block[] blockArray;
 	private Glow glow;
 	private GraphicsContext gameGc, nextBlockGc;
+	private VBox pauseMenu;
+
+	private SaveLoad saveLoad;
 
 	private Block currentBlock;
 	private Block nextStepBlock;
@@ -38,15 +43,17 @@ public class GameLogic {
 		RUNNING, PAUSED, GAMEOVER, ANIMATING, DROPPING
 	}
 
-	public GameLogic(Label scoreLabel, GraphicsContext gameGc, GraphicsContext nextBlockGc) {
+	public GameLogic(Label scoreLabel, VBox pauseMenu, GraphicsContext bgGc, GraphicsContext nextBlockGc) {
 		super();
+		saveLoad = new SaveLoad();
 		this.cellsInX = 10;
 		this.cellsInY = 20;
 		this.cellArray = new Cell[cellsInX][cellsInY];
 		this.spawnX = 4;
 		this.spawnY = 1;
-		this.gameGc = gameGc;
+		this.gameGc = bgGc;
 		this.nextBlockGc = nextBlockGc;
+		this.pauseMenu = pauseMenu;
 		score = new SimpleStringProperty("0");
 		glow = new Glow();
 		glow.setLevel(0.9);
@@ -90,7 +97,7 @@ public class GameLogic {
 		// Thread.sleep(20);
 		// count++;
 		// if (count >= updateTime) {
-		if (state != State.DROPPING) {
+		if (state == State.RUNNING) {
 			updateBlock(Action.FALL);
 		}
 		// count = 0;
@@ -136,15 +143,28 @@ public class GameLogic {
 			case SPACE:
 				dropBlock();
 				break;
+			case ESCAPE:
+				togglePause();
+				toggleShowMenu();
+				break;
 			default:
 				break;
 			}
 
 	}
 
+	public void toggleShowMenu() {
+		pauseMenu.setVisible(!pauseMenu.isVisible());
+	}
+
+	public void togglePause() {
+		state = state == State.PAUSED ? State.RUNNING : State.PAUSED;
+		System.out.println(state);
+	}
+
 	private void dropBlock() {
 		state = State.DROPPING;
-		
+
 		nextStepBlock = currentBlock.makeCopy();
 		deactivateBlockCells(currentBlock);
 		nextStepBlock.setY(findLowpoint(nextStepBlock));
@@ -378,8 +398,7 @@ public class GameLogic {
 
 				totalsum = sumX + sumY;
 
-				cellArray[j][i].setColors(0.15f, 0.15f, 0.8f, totalsum);
-				cell.setColors(0.15f, 0.15f, 0.8f, totalsum);
+				cell.setColors(0.2f, 0.2f, 0.8f, totalsum);
 
 				gameGc.strokeRect(j * unit, i * unit, unit, unit);
 				gameGc.setFill(cell.getBgColor());
@@ -390,7 +409,6 @@ public class GameLogic {
 		}
 	}
 
-	
 	public void drawGraphics(GraphicsContext blockGc) {
 		blockGc.getCanvas().setEffect(glow);
 		blockGc.clearRect(0, 0, blockGc.getCanvas().getWidth(), blockGc.getCanvas().getHeight());

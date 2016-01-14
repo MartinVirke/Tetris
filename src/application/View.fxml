@@ -8,28 +8,42 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane fx:id="borderPane" prefHeight="500.0" prefWidth="512.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.Controller">
-   <left>
-      <Canvas fx:id="nextBlockCanvas" height="100.0" width="100.0" BorderPane.alignment="CENTER" />
-   </left>
-   <right>
-      <Label fx:id="scoreLabel" prefHeight="17.0" prefWidth="115.0" text="Label" textFill="#0022ff" textOverrun="CLIP" BorderPane.alignment="CENTER">
-         <font>
-            <Font name="Impact" size="24.0" />
-         </font>
-         <effect>
-            <Reflection bottomOpacity="0.08" fraction="1.0" topOpacity="0.32" />
-         </effect>
-      </Label>
-   </right>
-   <center>
-      <StackPane prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+
+<Pane fx:id="rootPane" prefHeight="500.0" prefWidth="455.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.Controller">
+   <children>
+      <VBox fx:id="vBox1">
          <children>
-            <Canvas fx:id="bufferCanvas1" height="500.0" width="250.0" />
-            <Canvas fx:id="bufferCanvas2" height="500.0" width="250.0" />
-            <Canvas fx:id="blockCanvas" height="500.0" width="250.0" />
-            <Canvas fx:id="gameCanvas" height="500.0" width="250.0" />
+            <HBox fx:id="hBox1">
+               <children>
+                  <Canvas fx:id="nextBlockCanvas" height="100.0" width="100.0" HBox.hgrow="ALWAYS" />
+                  <StackPane prefHeight="150.0" prefWidth="200.0">
+                     <children>
+                        <Canvas fx:id="bufferCanvas1" height="500.0" width="250.0" />
+                        <Canvas fx:id="bufferCanvas2" height="500.0" width="250.0" />
+                        <Canvas fx:id="blockCanvas" height="500.0" width="250.0" />
+                        <Canvas fx:id="bgCanvas" height="500.0" width="250.0" />
+                     </children>
+                  </StackPane>
+                  <Label fx:id="scoreLabel" contentDisplay="CENTER" text="Label" textFill="#0022ff" textOverrun="CLIP" HBox.hgrow="ALWAYS">
+                     <font>
+                        <Font name="Impact" size="24.0" />
+                     </font>
+                     <effect>
+                        <Reflection bottomOpacity="0.08" fraction="1.0" topOpacity="0.32" />
+                     </effect>
+                  </Label>
+               </children>
+            </HBox>
          </children>
-      </StackPane>
-   </center>
-</BorderPane>
+      </VBox>
+      <VBox fx:id="pauseMenu" layoutX="80.0" layoutY="80.0" prefHeight="338.0" prefWidth="300.0" visible="false">
+         <children>
+            <Button fx:id="resumeBtn" mnemonicParsing="false" text="Resume" />
+            <Button fx:id="loadBtn" mnemonicParsing="false" text="Load" />
+            <Button fx:id="saveBtn" mnemonicParsing="false" text="Save" />
+            <Button fx:id="highscoresBtn" mnemonicParsing="false" text="Highscores" />
+            <Button fx:id="exitBtn" mnemonicParsing="false" text="Exit" />
+         </children>
+      </VBox>
+   </children>
+</Pane>
