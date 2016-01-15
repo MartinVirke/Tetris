@@ -87,7 +87,7 @@ public class Controller implements Initializable {
 		});
 
 		highscoresBtn.setOnAction(event -> {
-
+			
 		});
 
 		exitBtn.setOnAction(event -> {
@@ -111,22 +111,20 @@ public class Controller implements Initializable {
 		logic.getScore().addListener((observable, newvalue, oldvalue) -> {
 			Platform.runLater(() -> {
 				scoreLabel.setText(String.valueOf(observable.getValue()));
-//						logic.getScore().getSerializableValue()));
 			});
 		});
 	}
 
 	public void simpleLoop() {
 		running = true;
-		int updateTime = 20;
 		int gameCount = 0;
 		while (running) {
-			if (gameCount >= updateTime) {
+			if (gameCount >= logic.getUpdateTime()) {
 				logic.gameUpdate();
 				gameCount = 0;
 			}
 
-			if (logic.getState() == State.RUNNING)
+			if (logic.getState() == State.RUNNING || logic.getState() == State.DROPPING)
 				logic.drawGraphics(blockCanvas.getGraphicsContext2D());
 
 			gameCount++;
