@@ -1,12 +1,15 @@
 package application;
 
+import java.io.Serializable;
+
 import javafx.scene.paint.Color;
 
-public class Cell {
+public class Cell implements Serializable {
 
 	private int x, y, imageId;
 	private boolean alive;
-	private Color bgColor, bgShade;
+	private double r, g, b, a;
+	private transient Color bgColor, bgShade;
 
 	public Cell(int x, int y) {
 		super();
@@ -14,10 +17,19 @@ public class Cell {
 		this.y = y;
 	}
 
-	public void setColors(double r, double g, double b, double a) {
+	public void setColors() {
 		this.bgColor = new Color(r, g, b, 1.0f);
-		this.bgShade = new Color(0.0f, 0.0f, 0.0f, 1.0f - a / 25);
+		this.bgShade = new Color(0.0f, 0.0f, 0.0f, this.a);
 	}
+	
+	public void setColors(double r, double g, double b, double a) {
+		this.r = r;
+		this.g = g;
+		this.b = b;
+		this.a = 1.0f - a / 25;
+		setColors();
+	}
+
 
 	public boolean isAlive() {
 		return alive;
@@ -51,8 +63,8 @@ public class Cell {
 		this.alive = alive;
 	}
 
-	public void setColorId(int colorId) {
-		this.imageId = colorId;
+	public void setImageId(int imageId) {
+		this.imageId = imageId;
 	}
 
 	public int getX() {

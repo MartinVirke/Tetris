@@ -18,8 +18,6 @@
                   <Canvas fx:id="nextBlockCanvas" height="100.0" width="100.0" HBox.hgrow="ALWAYS" />
                   <StackPane prefHeight="150.0" prefWidth="200.0">
                      <children>
-                        <Canvas fx:id="bufferCanvas1" height="500.0" width="250.0" />
-                        <Canvas fx:id="bufferCanvas2" height="500.0" width="250.0" />
                         <Canvas fx:id="blockCanvas" height="500.0" width="250.0" />
                         <Canvas fx:id="bgCanvas" height="500.0" width="250.0" />
                      </children>

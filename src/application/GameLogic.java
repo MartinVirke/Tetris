@@ -3,15 +3,11 @@ package application;
 import java.io.Serializable;
 import java.util.Random;
 
-import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Label;
-import javafx.scene.effect.Glow;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-
 
 public class GameLogic implements Serializable {
 
@@ -19,37 +15,36 @@ public class GameLogic implements Serializable {
 	private int cellsInY;
 	private int updateTime, spawnX, spawnY;
 	private float unit;
-	
+
 	private Block currentBlock;
 	private Block nextStepBlock;
 	private Block nextBlock;
 	private Block[] blockArray;
 	private State state;
+//	private int scoreInt;
+	private Cell[][] cellArray;
+	private SimpleIntegerPropertySerializable score;
 	
-	private transient SimpleStringProperty score;
-	private transient Glow glow;
-	private transient GraphicsContext gameGc, nextBlockGc;
+	private transient GraphicsContext bgGc, nextBlockGc;
 	private transient VBox pauseMenu;
-	private transient Cell[][] cellArray;
 	private transient Image[] imageArray;
 
 	private enum Action {
 		LEFT, RIGHT, ROTATE, DROP, FALL, SHOW
 	}
 
-	public GameLogic(Label scoreLabel, VBox pauseMenu, GraphicsContext bgGc, GraphicsContext nextBlockGc) {
+
+	public GameLogic(VBox pauseMenu, GraphicsContext bgGc, GraphicsContext nextBlockGc) {
 		super();
 		this.cellsInX = 10;
 		this.cellsInY = 20;
 		this.cellArray = new Cell[cellsInX][cellsInY];
 		this.spawnX = 4;
 		this.spawnY = 1;
-		this.gameGc = bgGc;
+		this.bgGc = bgGc;
 		this.nextBlockGc = nextBlockGc;
 		this.pauseMenu = pauseMenu;
-		score = new SimpleStringProperty("0");
-		glow = new Glow();
-		glow.setLevel(0.9);
+		score = new SimpleIntegerPropertySerializable(0);
 		addImages();
 		addBlocks();
 		populateArray();
@@ -59,7 +54,32 @@ public class GameLogic implements Serializable {
 		state = State.RUNNING;
 		updateTime = 60;
 	}
+	
+	public void initFromSave(VBox pauseMenu, GraphicsContext bgGc, GraphicsContext nextBlockGc) {
+		addImages();
+		
+		this.pauseMenu = pauseMenu;
+		this.bgGc = bgGc;
+		this.nextBlockGc = nextBlockGc;
+		
+//		glow = new GlowSerializable();
+//		glow.setLevel(0.9);
+//		score = new SimpleIntegerPropertySerializable(scoreInt);
+		
+		for (int i = 0; i < cellsInY; i++) {
+			for (int j = 0; j < cellsInX; j++) {
+				cellArray[j][i].setColors();
+			}
+		}
+	}
 
+	public synchronized void gameUpdate() {
+		if (state == State.RUNNING) {
+			System.out.println(score.getSerializableValue());
+			updateBlock(Action.FALL);
+		}
+	}
+	
 	private void addImages() {
 		imageArray = new Image[7];
 		imageArray[0] = new Image("Image/blue.jpg");
@@ -82,11 +102,6 @@ public class GameLogic implements Serializable {
 		blockArray[6] = new LineBlock(spawnX, spawnY, 3);
 	}
 
-	public synchronized void gameUpdate() {
-		if (state == State.RUNNING) {
-			updateBlock(Action.FALL);
-		}
-	}
 
 	private void populateArray() {
 		for (int i = 0; i < cellsInY; i++) {
@@ -124,6 +139,16 @@ public class GameLogic implements Serializable {
 
 	}
 
+	public synchronized void keyReleased(KeyCode code) {
+		switch (code) {
+		case S:
+			updateTime = 100;
+			break;
+		default:
+			break;
+		}
+	}
+	
 	public void toggleShowMenu() {
 		pauseMenu.setVisible(!pauseMenu.isVisible());
 	}
@@ -159,15 +184,6 @@ public class GameLogic implements Serializable {
 		tmpThread.start();
 	}
 
-	public synchronized void keyReleased(KeyCode code) {
-		switch (code) {
-		case S:
-			updateTime = 100;
-			break;
-		default:
-			break;
-		}
-	}
 
 	private int getCellX(int index, Block block) {
 		int tmpX = block.getPattern()[block.getRot()][index];
@@ -181,7 +197,7 @@ public class GameLogic implements Serializable {
 
 	private void activateBlockCells(Block block) {
 		for (int i = 0; i < 4; i++) {
-			cellArray[getCellX(i, block)][getCellY(i, block)].setColorId(block.getColor().ordinal());
+			cellArray[getCellX(i, block)][getCellY(i, block)].setImageId(block.getColor().ordinal());
 			cellArray[getCellX(i, block)][getCellY(i, block)].setAlive(true);
 		}
 	}
@@ -265,7 +281,6 @@ public class GameLogic implements Serializable {
 	}
 
 	private void spawnBlock() {
-		// newBlock();
 		currentBlock = nextBlock;
 		newBlock();
 
@@ -301,53 +316,43 @@ public class GameLogic implements Serializable {
 			addScore(linesCleared);
 	}
 
+	private void moveLinesDown(int startRow) {
+		for (int i = startRow; i > 0; i--) {
+			for (int j = 0; j < cellsInX; j++) {
+				cellArray[j][i].setAlive(cellArray[j][i - 1].isAlive());
+				cellArray[j][i].setImageId(cellArray[j][i - 1].getImageId());
+			}
+		}
+	}
+
 	private void addScore(int linesCleared) {
-		int oldValue = Integer.parseInt(score.getValue());
 		switch (linesCleared) {
 		case 1:
-			// score += 40;
-			score.setValue(String.valueOf(oldValue + 40));
+			score.setSerializableValue(score.getSerializableValue() + 40);
 			break;
 		case 2:
-			score.setValue(String.valueOf(oldValue + 100));
-			// score += 100;
+			score.setSerializableValue(score.getSerializableValue() + 100);
 			break;
 		case 3:
-			score.setValue(String.valueOf(oldValue + 300));
-			// score += 300;
+			score.setSerializableValue(score.getSerializableValue() + 300);
 			break;
 		case 4:
-			score.setValue(String.valueOf(oldValue + 1200));
-			// score += 1200;
+			score.setSerializableValue(score.getSerializableValue() + 1200);
 			break;
 		default:
 			break;
 		}
 	}
-
-	private void moveLinesDown(int startRow) {
-		for (int i = startRow; i > 0; i--) {
-			for (int j = 0; j < cellsInX; j++) {
-				cellArray[j][i].setAlive(cellArray[j][i - 1].isAlive());
-				cellArray[j][i].setColorId(cellArray[j][i - 1].getImageId());
-			}
-		}
-	}
-
-	public int getUpdateTime() {
-		return updateTime;
-	}
-
+	
 	private void setBackground() {
 		double cellsX = (double) cellsInX / 2;
 		double sumX, sumY, totalsum;
 		double di;
 		double dj;
 
-		nextBlockGc.getCanvas().setEffect(glow);
 
-		unit = (float) (gameGc.getCanvas().getWidth() / cellsInX);
-		gameGc.setStroke(Color.BLACK);
+		unit = (float) (bgGc.getCanvas().getWidth() / cellsInX);
+		bgGc.setStroke(Color.BLACK);
 
 		for (int i = 0; i < cellsInY; i++) {
 			for (int j = 0; j < cellsInX; j++) {
@@ -371,17 +376,16 @@ public class GameLogic implements Serializable {
 
 				cell.setColors(0.2f, 0.2f, 0.8f, totalsum);
 
-				gameGc.strokeRect(j * unit, i * unit, unit, unit);
-				gameGc.setFill(cell.getBgColor());
-				gameGc.fillRect(j * unit, i * unit, unit, unit);
-				gameGc.setFill(cell.getBgShade());
-				gameGc.fillRect(j * unit, i * unit, unit, unit);
+				bgGc.strokeRect(j * unit, i * unit, unit, unit);
+				bgGc.setFill(cell.getBgColor());
+				bgGc.fillRect(j * unit, i * unit, unit, unit);
+				bgGc.setFill(cell.getBgShade());
+				bgGc.fillRect(j * unit, i * unit, unit, unit);
 			}
 		}
 	}
 
 	public void drawGraphics(GraphicsContext blockGc) {
-		blockGc.getCanvas().setEffect(glow);
 		blockGc.clearRect(0, 0, blockGc.getCanvas().getWidth(), blockGc.getCanvas().getHeight());
 		nextBlockGc.clearRect(0, 0, nextBlockGc.getCanvas().getWidth(), nextBlockGc.getCanvas().getHeight());
 		for (int i = 0; i < cellsInY; i++) {
@@ -401,6 +405,10 @@ public class GameLogic implements Serializable {
 		}
 	}
 
+	public int getUpdateTime() {
+		return updateTime;
+	}
+	
 	public State getState() {
 		return state;
 	}
@@ -409,7 +417,8 @@ public class GameLogic implements Serializable {
 		this.state = state;
 	}
 
-	public SimpleStringProperty getScore() {
+	public SimpleIntegerPropertySerializable getScore() {
+		System.out.println("listening");
 		return score;
 	}
 }

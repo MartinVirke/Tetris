@@ -20,9 +20,9 @@ public class ReadWriteHandler {
 		}
 	}
 
-	public Object loadFile() {
+	public GameLogic loadFile() {
 		try (ObjectInputStream in = new ObjectInputStream(new FileInputStream("C:/temp/save.ser"))) {
-			return in.readObject();
+			return (GameLogic) in.readObject();
 		} catch (IOException i) {
 			i.printStackTrace();
 		} catch (ClassNotFoundException c) {

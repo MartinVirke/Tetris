@@ -10,6 +10,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.effect.Glow;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
@@ -22,13 +23,11 @@ public class Controller implements Initializable {
 	@FXML
 	private Pane rootPane;
 	@FXML
+	private Canvas blockCanvas;
+	@FXML
 	private Canvas bgCanvas;
 	@FXML
 	private Canvas nextBlockCanvas;
-	@FXML
-	private Canvas bufferCanvas1;
-	@FXML
-	private Canvas bufferCanvas2;
 	@FXML
 	private Label scoreLabel;
 	@FXML
@@ -40,8 +39,6 @@ public class Controller implements Initializable {
 
 	private GameLogic logic;
 
-	private GraphicsContext blockGc;
-
 	private ReadWriteHandler rwHandler;
 
 	private boolean running;
@@ -49,9 +46,14 @@ public class Controller implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 
-		logic = new GameLogic(scoreLabel, pauseMenu, bgCanvas.getGraphicsContext2D(),
-				nextBlockCanvas.getGraphicsContext2D());
+		logic = new GameLogic(pauseMenu, bgCanvas.getGraphicsContext2D(), nextBlockCanvas.getGraphicsContext2D());
 		rwHandler = new ReadWriteHandler();
+		
+		blockCanvas.toFront();
+		blockCanvas.setEffect(new Glow(0.9));
+		nextBlockCanvas.setEffect(new Glow(0.9));
+		
+		initScoreListener();
 
 		Platform.runLater(() -> {
 			rootPane.requestFocus();
@@ -63,7 +65,7 @@ public class Controller implements Initializable {
 			});
 		});
 
-		scoreLabel.setText(logic.getScore().getValue());
+		scoreLabel.setText(String.valueOf(logic.getScore().getSerializableValue()));
 
 		rootPane.setBackground(new Background(new BackgroundFill(new Color(0.0, 0.0, 0.09, 1), null, null)));
 
@@ -73,7 +75,11 @@ public class Controller implements Initializable {
 		});
 
 		loadBtn.setOnAction(event -> {
-			logic = (GameLogic) rwHandler.loadFile();
+			logic = rwHandler.loadFile();
+			logic.initFromSave(pauseMenu, bgCanvas.getGraphicsContext2D(), nextBlockCanvas.getGraphicsContext2D());
+			logic.togglePause();
+			logic.toggleShowMenu();
+			initScoreListener();
 		});
 
 		saveBtn.setOnAction(event -> {
@@ -89,16 +95,6 @@ public class Controller implements Initializable {
 			Platform.exit();
 		});
 
-		logic.getScore().addListener((observable, newvalue, oldvalue) -> {
-			Platform.runLater(() -> {
-				scoreLabel.setText(observable.getValue());
-			});
-		});
-
-		blockGc = bufferCanvas1.getGraphicsContext2D();
-		bufferCanvas2.toFront();
-		bufferCanvas1.toFront();
-
 		rootPane.setOnKeyPressed(event -> {
 			logic.keyPressed(event.getCode());
 		});
@@ -109,25 +105,35 @@ public class Controller implements Initializable {
 
 	}
 
+	public void initScoreListener() {
+		scoreLabel.setText(String.valueOf(logic.getScore().getSerializableValue()));
+		
+		logic.getScore().addListener((observable, newvalue, oldvalue) -> {
+			Platform.runLater(() -> {
+				scoreLabel.setText(String.valueOf(observable.getValue()));
+//						logic.getScore().getSerializableValue()));
+			});
+		});
+	}
+
 	public void simpleLoop() {
 		running = true;
 		int updateTime = 20;
 		int gameCount = 0;
 		while (running) {
-			if (logic.getState() == State.RUNNING) {
-				if (gameCount >= updateTime) {
-					logic.gameUpdate();
-					gameCount = 0;
-				}
+			if (gameCount >= updateTime) {
+				logic.gameUpdate();
+				gameCount = 0;
+			}
 
-				logic.drawGraphics(blockGc);
+			if (logic.getState() == State.RUNNING)
+				logic.drawGraphics(blockCanvas.getGraphicsContext2D());
 
-				gameCount++;
-				try {
-					Thread.sleep(20);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+			gameCount++;
+			try {
+				Thread.sleep(20);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		}
 	}
