@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.*?>
 <?import javafx.scene.effect.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.control.*?>
@@ -11,6 +12,19 @@
 
 <Pane fx:id="rootPane" prefHeight="500.0" prefWidth="455.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.Controller">
    <children>
+      <BorderPane fx:id="gameOverMenu" layoutX="97.0" layoutY="158.0" prefHeight="180.0" prefWidth="250.0">
+         <center>
+            <Label text="Label" BorderPane.alignment="CENTER" />
+         </center>
+      </BorderPane>
+      <BorderPane fx:id="highscoreMenu" layoutX="65.0" layoutY="62.0" prefHeight="376.0" prefWidth="327.0" visible="false">
+         <bottom>
+            <Button fx:id="okBtn" mnemonicParsing="false" text="Button" BorderPane.alignment="BOTTOM_RIGHT" />
+         </bottom>
+         <center>
+            <Label fx:id="highscoreLabel" prefHeight="382.0" prefWidth="327.0" text="Label" BorderPane.alignment="CENTER" />
+         </center>
+      </BorderPane>
       <VBox fx:id="vBox1">
          <children>
             <HBox fx:id="hBox1">

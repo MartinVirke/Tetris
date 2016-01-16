@@ -1,5 +1,5 @@
 package application;
 
 public enum State {
-	RUNNING, PAUSED, GAMEOVER, ANIMATING, DROPPING
+	RUNNING, PAUSED, GAMEOVER, DROPPING
 }

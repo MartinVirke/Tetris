@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import javafx.application.Platform;
+import javafx.beans.value.ObservableObjectValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
@@ -12,10 +13,12 @@ import javafx.scene.control.Label;
 import javafx.scene.effect.Glow;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 
 public class Controller implements Initializable {
 
@@ -34,11 +37,15 @@ public class Controller implements Initializable {
 	@FXML
 	private HBox hBox1;
 	@FXML
-	private Button resumeBtn, loadBtn, saveBtn, highscoresBtn, exitBtn;
+	private Button resumeBtn, loadBtn, saveBtn, highscoresBtn, exitBtn, okBtn;
+	@FXML
+	private BorderPane highscoreMenu;
+	@FXML
+	private BorderPane gameOverMenu;
+	@FXML
+	private Label highscoreLabel;
 
 	private GameLogic logic;
-
-	private ReadWriteHandler rwHandler;
 
 	private boolean running;
 
@@ -46,13 +53,17 @@ public class Controller implements Initializable {
 	public void initialize(URL location, ResourceBundle resources) {
 
 		logic = new GameLogic(pauseMenu, bgCanvas.getGraphicsContext2D(), nextBlockCanvas.getGraphicsContext2D());
-		rwHandler = new ReadWriteHandler();
+
+		ReadWriteHandler rwHandler = new ReadWriteHandler();
 		HighscoreHandler hsHandler = new HighscoreHandler();
-		
+
+		highscoreMenu.setBackground(new Background(new BackgroundFill(new Color(0.5, 0.5, 0.9, 1), null, null)));
+
 		blockCanvas.toFront();
 		blockCanvas.setEffect(new Glow(0.9));
 		nextBlockCanvas.setEffect(new Glow(0.9));
-		
+		highscoreMenu.toFront();
+
 		initScoreListener();
 
 		Platform.runLater(() -> {
@@ -61,7 +72,9 @@ public class Controller implements Initializable {
 
 		rootPane.focusedProperty().addListener((observable, newvalue, oldvalue) -> {
 			Platform.runLater(() -> {
-				rootPane.requestFocus();
+				if (logic.getState() == State.RUNNING) {
+					setGameFocus();
+				}
 			});
 		});
 
@@ -72,22 +85,26 @@ public class Controller implements Initializable {
 		resumeBtn.setOnAction(event -> {
 			logic.togglePause();
 			logic.toggleShowMenu();
+			setGameFocus();
 		});
-
+		
 		loadBtn.setOnAction(event -> {
-			logic = rwHandler.loadFile();
+			logic = (GameLogic) rwHandler.readFiles(logic);
 			logic.initFromSave(pauseMenu, bgCanvas.getGraphicsContext2D(), nextBlockCanvas.getGraphicsContext2D());
-			logic.togglePause();
-			logic.toggleShowMenu();
 			initScoreListener();
+			logic.drawGraphics(blockCanvas.getGraphicsContext2D());
 		});
 
 		saveBtn.setOnAction(event -> {
-			rwHandler.saveFile(logic);
+			rwHandler.writeFile(logic);
 		});
 
 		highscoresBtn.setOnAction(event -> {
-			
+			highscoreMenu.setVisible(!highscoreMenu.isVisible());
+		});
+
+		okBtn.setOnAction(event -> {
+			highscoreMenu.setVisible(!highscoreMenu.isVisible());
 		});
 
 		exitBtn.setOnAction(event -> {
@@ -105,9 +122,13 @@ public class Controller implements Initializable {
 
 	}
 
+	private void setGameFocus() {
+		rootPane.requestFocus();
+	}
+
 	public void initScoreListener() {
 		scoreLabel.setText(String.valueOf(logic.getScore().getSerializableValue()));
-		
+
 		logic.getScore().addListener((observable, newvalue, oldvalue) -> {
 			Platform.runLater(() -> {
 				scoreLabel.setText(String.valueOf(observable.getValue()));
@@ -126,7 +147,7 @@ public class Controller implements Initializable {
 
 			if (logic.getState() == State.RUNNING || logic.getState() == State.DROPPING)
 				logic.drawGraphics(blockCanvas.getGraphicsContext2D());
-
+			
 			gameCount++;
 			try {
 				Thread.sleep(20);

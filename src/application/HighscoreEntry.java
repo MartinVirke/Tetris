@@ -7,7 +7,7 @@ public class HighscoreEntry {
 	private String name;
 	private int score;
 	private Date date;
-	
+
 	public HighscoreEntry(String name, int score) {
 		super();
 		this.name = name;
@@ -26,5 +26,9 @@ public class HighscoreEntry {
 	public Date getDate() {
 		return date;
 	}
-	
+
+	@Override
+	public String toString() {
+		return name + " " + score;
+	}
 }

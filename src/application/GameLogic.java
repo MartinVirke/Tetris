@@ -69,7 +69,6 @@ public class GameLogic implements Serializable {
 
 	public synchronized void gameUpdate() {
 		if (state == State.RUNNING) {
-			System.out.println(score.getSerializableValue());
 			updateBlock(Action.FALL);
 		}
 	}
@@ -403,13 +402,15 @@ public class GameLogic implements Serializable {
 	public State getState() {
 		return state;
 	}
+	public Integer getStateOrdinal(){
+		return state.ordinal();
+	}
 
 	public void setState(State state) {
 		this.state = state;
 	}
 
 	public SimpleIntegerPropertySerializable getScore() {
-		System.out.println("listening");
 		return score;
 	}
 }
