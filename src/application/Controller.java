@@ -7,7 +7,6 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.effect.Glow;
@@ -48,6 +47,7 @@ public class Controller implements Initializable {
 
 		logic = new GameLogic(pauseMenu, bgCanvas.getGraphicsContext2D(), nextBlockCanvas.getGraphicsContext2D());
 		rwHandler = new ReadWriteHandler();
+		HighscoreHandler hsHandler = new HighscoreHandler();
 		
 		blockCanvas.toFront();
 		blockCanvas.setEffect(new Glow(0.9));
