@@ -12,17 +12,27 @@
 
 <Pane fx:id="rootPane" prefHeight="500.0" prefWidth="455.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.Controller">
    <children>
-      <BorderPane fx:id="gameOverMenu" layoutX="97.0" layoutY="158.0" prefHeight="180.0" prefWidth="250.0">
+      <BorderPane fx:id="goMenu" layoutX="97.0" layoutY="158.0" prefHeight="180.0" prefWidth="250.0" visible="false">
+         <top>
+            <Label text="Game over! &#10;Enter your name!" BorderPane.alignment="CENTER" />
+         </top>
          <center>
-            <Label text="Label" BorderPane.alignment="CENTER" />
+            <TextField fx:id="goField" BorderPane.alignment="CENTER" />
          </center>
-      </BorderPane>
-      <BorderPane fx:id="highscoreMenu" layoutX="65.0" layoutY="62.0" prefHeight="376.0" prefWidth="327.0" visible="false">
          <bottom>
-            <Button fx:id="okBtn" mnemonicParsing="false" text="Button" BorderPane.alignment="BOTTOM_RIGHT" />
+            <Button fx:id="goBtn" mnemonicParsing="false" text="Submit highscore" BorderPane.alignment="CENTER" />
+         </bottom>
+      </BorderPane>
+      <BorderPane fx:id="hsMenu" layoutX="65.0" layoutY="62.0" prefHeight="376.0" prefWidth="327.0" visible="false">
+         <bottom>
+            <Button fx:id="hsBtn" mnemonicParsing="false" text="Close" BorderPane.alignment="BOTTOM_RIGHT" />
          </bottom>
          <center>
-            <Label fx:id="highscoreLabel" prefHeight="382.0" prefWidth="327.0" text="Label" BorderPane.alignment="CENTER" />
+            <Label fx:id="hsLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="382.0" prefWidth="327.0" text="Label" BorderPane.alignment="CENTER">
+               <font>
+                  <Font name="Impact" size="32.0" />
+               </font>
+            </Label>
          </center>
       </BorderPane>
       <VBox fx:id="vBox1">
@@ -51,6 +61,7 @@
       <VBox fx:id="pauseMenu" layoutX="80.0" layoutY="80.0" prefHeight="338.0" prefWidth="300.0" visible="false">
          <children>
             <Button fx:id="resumeBtn" mnemonicParsing="false" text="Resume" />
+            <Button fx:id="newGameBtn" mnemonicParsing="false" text="New game" />
             <Button fx:id="loadBtn" mnemonicParsing="false" text="Load" />
             <Button fx:id="saveBtn" mnemonicParsing="false" text="Save" />
             <Button fx:id="highscoresBtn" mnemonicParsing="false" text="Highscores" />

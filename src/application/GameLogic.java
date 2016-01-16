@@ -20,10 +20,11 @@ public class GameLogic implements Serializable {
 	private Block nextStepBlock;
 	private Block nextBlock;
 	private Block[] blockArray;
-	private State state;
 	private Cell[][] cellArray;
 	private SimpleIntegerPropertySerializable score;
-
+	private State state;
+	
+	private transient Controller controller;
 	private transient GraphicsContext bgGc, nextBlockGc;
 	private transient VBox pauseMenu;
 	private transient Image[] imageArray;
@@ -32,7 +33,7 @@ public class GameLogic implements Serializable {
 		LEFT, RIGHT, ROTATE, DROP, FALL, SHOW
 	}
 
-	public GameLogic(VBox pauseMenu, GraphicsContext bgGc, GraphicsContext nextBlockGc) {
+	public GameLogic(VBox pauseMenu, GraphicsContext bgGc, GraphicsContext nextBlockGc, Controller controller) {
 		super();
 		this.cellsInX = 10;
 		this.cellsInY = 20;
@@ -42,6 +43,7 @@ public class GameLogic implements Serializable {
 		this.bgGc = bgGc;
 		this.nextBlockGc = nextBlockGc;
 		this.pauseMenu = pauseMenu;
+		this.controller = controller;
 		score = new SimpleIntegerPropertySerializable(0);
 		addImages();
 		addBlocks();
@@ -49,17 +51,17 @@ public class GameLogic implements Serializable {
 		newBlock();
 		spawnBlock();
 		setBackground();
-		state = State.RUNNING;
+		setState(State.RUNNING);
 		updateTime = 20;
 	}
 
-	public void initFromSave(VBox pauseMenu, GraphicsContext bgGc, GraphicsContext nextBlockGc) {
+	public void initFromSave(VBox pauseMenu, GraphicsContext bgGc, GraphicsContext nextBlockGc, Controller controller) {
 		addImages();
 
 		this.pauseMenu = pauseMenu;
 		this.bgGc = bgGc;
 		this.nextBlockGc = nextBlockGc;
-
+		this.controller = controller;
 		for (int i = 0; i < cellsInY; i++) {
 			for (int j = 0; j < cellsInX; j++) {
 				cellArray[j][i].setColors();
@@ -146,12 +148,11 @@ public class GameLogic implements Serializable {
 	}
 
 	public void togglePause() {
-		state = state == State.PAUSED ? State.RUNNING : State.PAUSED;
-		System.out.println(state);
+		setState(state == State.PAUSED ? State.RUNNING : State.PAUSED);
 	}
 
 	private void dropBlock() {
-		state = State.DROPPING;
+		setState(State.DROPPING);
 
 		nextStepBlock = currentBlock.makeCopy();
 		deactivateBlockCells(currentBlock);
@@ -171,7 +172,7 @@ public class GameLogic implements Serializable {
 			activateBlockCells(nextStepBlock);
 			currentBlock = nextStepBlock;
 			spawnBlock();
-			state = State.RUNNING;
+			setState(State.RUNNING);
 		});
 		dropThread.start();
 	}
@@ -283,7 +284,7 @@ public class GameLogic implements Serializable {
 	}
 
 	private void gameOver() {
-		state = State.GAMEOVER;
+		setState(State.GAMEOVER);
 	}
 
 	private void removeLines() {
@@ -395,19 +396,17 @@ public class GameLogic implements Serializable {
 		}
 	}
 
-	public int getUpdateTime() {
-		return updateTime;
-	}
-
 	public State getState() {
 		return state;
-	}
-	public Integer getStateOrdinal(){
-		return state.ordinal();
 	}
 
 	public void setState(State state) {
 		this.state = state;
+		controller.stateChange(state);
+	}
+
+	public int getUpdateTime() {
+		return updateTime;
 	}
 
 	public SimpleIntegerPropertySerializable getScore() {

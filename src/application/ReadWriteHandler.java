@@ -9,31 +9,27 @@ import java.io.ObjectOutputStream;
 
 public class ReadWriteHandler {
 
-	public void writeFile(Object o) {
-		try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(setPath(o)))) {
+	public void writeFile(Object o, String filename) {
+		try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(setPath(filename)))) {
 			out.writeObject(o);
 		} catch (IOException e) {
-			e.printStackTrace();
+			 e.printStackTrace();
 		}
 	}
 
-	public Object readFiles(Object o) {
-		try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(setPath(o)))) {
+	public Object readFiles(Object o, String filename) {
+		try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(setPath(filename)))) {
 			return in.readObject();
 		} catch (IOException | ClassNotFoundException e) {
-			e.printStackTrace();
+			 e.printStackTrace();
+			 return o;
 		}
-		return o;
 	}
 
-	private String setPath(Object o) {
+	private String setPath(String filename) {
 		String pathString = null;
 		File file = null;
-		if (o.getClass().equals(GameLogic.class)) {
-			file = new File("save.ser");
-		} else if (o.getClass().equals(HighscoreHandler.class)){
-			file = new File("hscore.ser");
-		}
+		file = new File(filename);
 		pathString = file.getPath();
 		System.out.println(pathString);
 		return pathString;
