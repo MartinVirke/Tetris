@@ -80,7 +80,7 @@ public class GameLogic implements Serializable {
 		newBlock();
 		spawnBlock();
 		setBackground();
-		setState(State.RUNNING);
+		setState(State.PAUSED);
 		updateTime = 20;
 	}
 

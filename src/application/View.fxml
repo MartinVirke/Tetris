@@ -92,5 +92,10 @@
          </children>
       </Pane>
       <Label fx:id="alertLabel" prefHeight="17.0" prefWidth="600.0" textFill="RED" />
+      <BorderPane fx:id="splashPane" prefHeight="600.0" prefWidth="600.0">
+         <center>
+            <Button fx:id="startBtn" mnemonicParsing="false" text="Start Game" textAlignment="CENTER" BorderPane.alignment="CENTER" />
+         </center>
+      </BorderPane>
    </children>
 </Pane>

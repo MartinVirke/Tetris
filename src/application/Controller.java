@@ -45,9 +45,9 @@ public class Controller implements Initializable {
 	@FXML
 	private HBox hBox1;
 	@FXML
-	private Button resumeBtn, loadBtn, saveBtn, highscoresBtn, exitBtn, hsBtn, goBtn, newGameBtn;
+	private Button resumeBtn, loadBtn, saveBtn, highscoresBtn, exitBtn, hsBtn, goBtn, newGameBtn, startBtn;
 	@FXML
-	private BorderPane hsMenu, goMenu;
+	private BorderPane hsMenu, goMenu, splashPane;
 	@FXML
 	private TextField goField;
 
@@ -81,6 +81,7 @@ public class Controller implements Initializable {
 		Background menuBackground = new Background(new BackgroundFill(new Color(0.4, 0.4, 1, 1), null, null));
 
 		rootPane.setBackground(paneBackground);
+		splashPane.setBackground(paneBackground);
 		pauseMenu.setBackground(menuBackground);
 		hsMenu.setBackground(menuBackground);
 		goMenu.setBackground(menuBackground);
@@ -103,8 +104,19 @@ public class Controller implements Initializable {
 					.bind(rootPane.widthProperty().divide(2).subtract(positionalPane.getWidth() / 2));
 			positionalPane.translateYProperty()
 					.bind(rootPane.heightProperty().divide(2).subtract(positionalPane.getHeight() / 2));
+			// This row is suppressed because casting ArrayList to object is
+			// unsafe, however using this approach we can keep rwHandler as
+			// open-ended as possible.
+			hsHandler.setHighscoreList(
+					(ArrayList<HighscoreEntry>) rwHandler.readFiles(hsHandler.getHighscoreList(), HIGHSCORE_FILENAME));
+			hsLabel.setText(hsHandler.getListString());
 		});
-
+		
+		startBtn.setOnAction(event->{
+			splashPane.setVisible(false);
+			logic.setState(State.RUNNING);
+		});
+		
 		resumeBtn.setOnAction(event -> {
 			logic.togglePause();
 			logic.toggleShowMenu();
@@ -118,11 +130,14 @@ public class Controller implements Initializable {
 			pauseMenu.setVisible(false);
 			resumeBtn.setDisable(false);
 			saveBtn.setDisable(false);
+			logic.setState(State.RUNNING);
 		});
 
 		loadBtn.setOnAction(event -> {
 			logic = (GameLogic) rwHandler.readFiles(logic, SAVEFILE_FILENAME);
 			logic.initFromSave(pauseMenu, bgCanvas.getGraphicsContext2D(), this);
+			resumeBtn.setDisable(false);
+			saveBtn.setDisable(false);
 			initScoreListener();
 			logic.drawGraphics(blockCanvas.getGraphicsContext2D(), nextBlockCanvas.getGraphicsContext2D());
 		});
