@@ -91,5 +91,6 @@
             </Pane>
          </children>
       </Pane>
+      <Label fx:id="alertLabel" prefHeight="17.0" prefWidth="600.0" textFill="RED" />
    </children>
 </Pane>

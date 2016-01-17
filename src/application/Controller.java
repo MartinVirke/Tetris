@@ -39,7 +39,7 @@ public class Controller implements Initializable {
 	@FXML
 	private Canvas blockCanvas, bgCanvas, nextBlockCanvas;
 	@FXML
-	private Label scoreLabel, hsLabel, goLabel;
+	private Label scoreLabel, hsLabel, goLabel, alertLabel;
 	@FXML
 	private VBox vBox1;
 	@FXML
@@ -104,6 +104,7 @@ public class Controller implements Initializable {
 		resumeBtn.setOnAction(event -> {
 			logic.togglePause();
 			logic.toggleShowMenu();
+			displayAlert("");
 		});
 
 		newGameBtn.setOnAction(event -> {
@@ -123,14 +124,22 @@ public class Controller implements Initializable {
 		});
 
 		saveBtn.setOnAction(event -> {
-			rwHandler.writeFile(logic, SAVEFILE_FILENAME);
+			try {
+				rwHandler.writeFile(logic, SAVEFILE_FILENAME);
+			} catch (Exception e) {
+				displayAlert("Unable to write to file " + SAVEFILE_FILENAME);
+			}
 		});
 
 		goBtn.setOnAction(event -> {
 			hsHandler.addEntry(goField.getText(), logic.getScore().intValue());
 			goMenu.setVisible(false);
 			pauseMenu.setVisible(true);
-			rwHandler.writeFile(hsHandler.getHighscoreList(), HIGHSCORE_FILENAME);
+			try {
+				rwHandler.writeFile(hsHandler.getHighscoreList(), HIGHSCORE_FILENAME);
+			} catch (Exception e) {
+				displayAlert("Unable to write to file " + HIGHSCORE_FILENAME);
+			}
 		});
 
 		highscoresBtn.setOnAction(event -> {
@@ -165,8 +174,12 @@ public class Controller implements Initializable {
 			gameLoop();
 		});
 
-		graphicsThread.setName("graphicsThread");
+		graphicsThread.setName("gameThread");
 		graphicsThread.start();
+	}
+
+	private void displayAlert(String alert) {
+		alertLabel.setText(alert);
 	}
 
 	/**
@@ -193,9 +206,12 @@ public class Controller implements Initializable {
 	}
 
 	/**
-	 * 
+	 * The loop that controls the game. While it's running it will increment
+	 * gameCount so it doesn't do the logic loop as often as it draws the
+	 * graphics. It also checks to see if it should instantly update the logic
+	 * and if it should draw the graphics.
 	 */
-	
+
 	public void gameLoop() {
 		running = true;
 		int gameCount = 0;
@@ -220,6 +236,14 @@ public class Controller implements Initializable {
 		}
 	}
 
+	/**
+	 * Called whenever the state is changed from logic, handles what should
+	 * happen in different states.
+	 * 
+	 * @param state
+	 *            The current state.
+	 */
+
 	public void stateChange(State state) {
 		switch (state) {
 		case GAMEOVER:
@@ -234,6 +258,12 @@ public class Controller implements Initializable {
 			break;
 		}
 	}
+
+	/**
+	 * Called whenever the game is over to handle what graphical element is
+	 * displayed depending of if the score is high enough to get on the
+	 * highscore.
+	 */
 
 	private void handleHighscore() {
 		if (hsHandler.isHighscore(logic.getScore().intValue())) {

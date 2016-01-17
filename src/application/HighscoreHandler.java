@@ -4,10 +4,22 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+/**
+ * Class for handling the creation, writing and sorting of the highscore, as
+ * well as calculating if a score is high enough to make it on the list.
+ * 
+ * @author Martin Virke
+ */
+
 public class HighscoreHandler {
 
 	private ArrayList<HighscoreEntry> highscore;
 	private Comparator<HighscoreEntry> highscoreComparator;
+
+	/**
+	 * Creates a new ArrayList and Comparator, as well as adding a preset of
+	 * names and scores to the list.
+	 */
 
 	public HighscoreHandler() {
 		super();
@@ -20,6 +32,16 @@ public class HighscoreHandler {
 		highscore.add(new HighscoreEntry("Kalle", 100));
 	}
 
+	/**
+	 * Adds an entry to the list, sorts the list and removes the 6th (lowest)
+	 * entry.
+	 * 
+	 * @param name
+	 *            Name of the new entrant.
+	 * @param score
+	 *            Score of the new entrant.
+	 */
+
 	public void addEntry(String name, int score) {
 		highscore.add(new HighscoreEntry(name, score));
 		sortList();
@@ -31,6 +53,14 @@ public class HighscoreHandler {
 		Collections.sort(highscore, highscoreComparator);
 	}
 
+	/**
+	 * Checks if the score is high enough to be on the highscore list.
+	 * 
+	 * @param score
+	 *            Score of the potential entrant.
+	 * @return
+	 */
+
 	public boolean isHighscore(int score) {
 		for (HighscoreEntry highscoreEntry : highscore) {
 			if (score >= highscoreEntry.getScore()) {
@@ -39,14 +69,33 @@ public class HighscoreHandler {
 		}
 		return false;
 	}
-	
-	public void setHighscoreList(ArrayList<HighscoreEntry> highscore){
+
+	/**
+	 * Sets the highscore list to a new highscore list, used when reading a
+	 * highscore list from a file.
+	 * 
+	 * @param highscore The new highscore list which is read from file.
+	 */
+
+	public void setHighscoreList(ArrayList<HighscoreEntry> highscore) {
 		this.highscore = highscore;
 	}
 	
-	public ArrayList<HighscoreEntry> getHighscoreList(){
+	/**
+	 * Gets the highscore list for writing to file
+	 * 
+	 * @return
+	 */
+
+	public ArrayList<HighscoreEntry> getHighscoreList() {
 		return highscore;
 	}
+	
+	/**
+	 * Compiles a String of all the entries for easy output.
+	 * 
+	 * @return returnString The compiled string of entries.
+	 */
 
 	public String getListString() {
 		String returnString = "";

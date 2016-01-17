@@ -8,7 +8,20 @@ import javafx.stage.Stage;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 
+/**
+ * View class which handles the creation of JavaFX and display of graphical
+ * elements.
+ * 
+ * @author Martin Virke
+ */
+
 public class Main extends Application {
+
+	/**
+	 * Sets up the JavaFX part of the application, and creates the controller
+	 * class instance through a FXML loader.
+	 */
+
 	@Override
 	public void start(Stage primaryStage) {
 		try {
@@ -23,6 +36,13 @@ public class Main extends Application {
 		} catch (Exception e) {
 		}
 	}
+
+	/**
+	 * Automatically generated code.
+	 * 
+	 * @param args
+	 *            Launch arguments.
+	 */
 
 	public static void main(String[] args) {
 		launch(args);
