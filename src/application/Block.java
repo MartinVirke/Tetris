@@ -45,6 +45,8 @@ public abstract class Block implements Serializable {
 	
 	/**
 	 * Abstract method needed for copying the blocks.
+	 * 
+	 * @return returns the new copy.
 	 */
 
 	public abstract Block makeCopy();
