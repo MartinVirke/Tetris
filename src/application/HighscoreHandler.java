@@ -23,7 +23,6 @@ public class HighscoreHandler {
 	public void addEntry(String name, int score) {
 		highscore.add(new HighscoreEntry(name, score));
 		sortList();
-		System.out.println("added");
 		if (highscore.size() > 5)
 			highscore.remove(highscore.size() - 1);
 	}

@@ -20,6 +20,14 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
+/**
+ * Controller class for the application, takes input from the user and sends it
+ * to the model class. It also holds the main game loop and keeps track of when
+ * and how it should run.
+ * 
+ * @author Martin Virke
+ */
+
 public class Controller implements Initializable {
 
 	private final String SAVEFILE_FILENAME = "save.ser";
@@ -51,6 +59,12 @@ public class Controller implements Initializable {
 
 	private boolean running;
 
+	/**
+	 * Initializes the application. It sets up the visual aspect of different
+	 * graphical elements as well as the model class, and adds eventhandlers to
+	 * graphical elements. It also starts the main loop.
+	 */
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -59,17 +73,20 @@ public class Controller implements Initializable {
 		rwHandler = new ReadWriteHandler();
 		hsHandler = new HighscoreHandler();
 
-		rootPane.setBackground(new Background(new BackgroundFill(new Color(0.0, 0.0, 0.09, 1), null, null)));
-		pauseMenu.setBackground(new Background(new BackgroundFill(new Color(0.0, 0.0, 0.09, 1), null, null)));
-		hsMenu.setBackground(new Background(new BackgroundFill(new Color(0.5, 0.5, 0.9, 1), null, null)));
-		goMenu.setBackground(new Background(new BackgroundFill(new Color(0.5, 0.5, 0.9, 1), null, null)));
+		Background paneBackground = new Background(new BackgroundFill(new Color(0.0, 0.0, 0.09, 1), null, null));
+		Background menuBackground = new Background(new BackgroundFill(new Color(0.4, 0.4, 1, 1), null, null));
+
+		rootPane.setBackground(paneBackground);
+		pauseMenu.setBackground(menuBackground);
+		hsMenu.setBackground(menuBackground);
+		goMenu.setBackground(menuBackground);
 
 		blockCanvas.setEffect(new Glow(0.9));
 		nextBlockCanvas.setEffect(new Glow(0.9));
 
 		scoreLabel.setText(String.valueOf(logic.getScore().getSerializableValue()));
 		hsLabel.setText(hsHandler.getListString());
-		
+
 		blockCanvas.toFront();
 		hsMenu.toFront();
 		goMenu.toFront();
@@ -118,7 +135,7 @@ public class Controller implements Initializable {
 
 		highscoresBtn.setOnAction(event -> {
 			// This row is suppressed because casting ArrayList to object is
-			// unsafe, however using this approach we can keep hsHandler as
+			// unsafe, however using this approach we can keep rwHandler as
 			// open-ended as possible.
 			hsHandler.setHighscoreList(
 					(ArrayList<HighscoreEntry>) rwHandler.readFiles(hsHandler.getHighscoreList(), HIGHSCORE_FILENAME));
@@ -145,16 +162,25 @@ public class Controller implements Initializable {
 		});
 
 		Thread graphicsThread = new Thread(() -> {
-			simpleLoop();
+			gameLoop();
 		});
 
 		graphicsThread.setName("graphicsThread");
 		graphicsThread.start();
 	}
 
+	/**
+	 * Sets the focus to rootPane so user input can be handled.
+	 */
+
 	private void setGameFocus() {
 		rootPane.requestFocus();
 	}
+
+	/**
+	 * Sets up a listener for the current score. Needs to be called after
+	 * loading a save file.
+	 */
 
 	public void initScoreListener() {
 		scoreLabel.setText(String.valueOf(logic.getScore().getSerializableValue()));
@@ -166,7 +192,11 @@ public class Controller implements Initializable {
 		});
 	}
 
-	public void simpleLoop() {
+	/**
+	 * 
+	 */
+	
+	public void gameLoop() {
 		running = true;
 		int gameCount = 0;
 		while (running) {
@@ -186,7 +216,6 @@ public class Controller implements Initializable {
 			try {
 				Thread.sleep(20);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
 			}
 		}
 	}
