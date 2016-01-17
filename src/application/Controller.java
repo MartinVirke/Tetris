@@ -23,7 +23,7 @@ import javafx.scene.paint.Color;
 public class Controller implements Initializable {
 
 	@FXML
-	private Pane rootPane;
+	private Pane rootPane, pauseMenu;;
 	@FXML
 	private Canvas blockCanvas;
 	@FXML
@@ -33,7 +33,7 @@ public class Controller implements Initializable {
 	@FXML
 	private Label scoreLabel;
 	@FXML
-	private VBox vBox1, pauseMenu;
+	private VBox vBox1;
 	@FXML
 	private HBox hBox1;
 	@FXML
@@ -68,7 +68,9 @@ public class Controller implements Initializable {
 		rwHandler = new ReadWriteHandler();
 		hsHandler = new HighscoreHandler();
 
+		goMenu.setBackground(new Background(new BackgroundFill(new Color(0.5, 0.5, 0.9, 1), null, null)));
 		hsMenu.setBackground(new Background(new BackgroundFill(new Color(0.5, 0.5, 0.9, 1), null, null)));
+		rootPane.setBackground(new Background(new BackgroundFill(new Color(0.0, 0.0, 0.09, 1), null, null)));
 
 		blockCanvas.setEffect(new Glow(0.9));
 		nextBlockCanvas.setEffect(new Glow(0.9));
@@ -80,7 +82,6 @@ public class Controller implements Initializable {
 
 		scoreLabel.setText(String.valueOf(logic.getScore().getSerializableValue()));
 
-		rootPane.setBackground(new Background(new BackgroundFill(new Color(0.0, 0.0, 0.09, 1), null, null)));
 
 		hsLabel.setText(hsHandler.getListString());
 
@@ -101,15 +102,16 @@ public class Controller implements Initializable {
 			logic.toggleShowMenu();
 		});
 
-		newGameBtn.setOnAction(event->{
-			logic = new GameLogic(pauseMenu, bgCanvas.getGraphicsContext2D(), nextBlockCanvas.getGraphicsContext2D(), this);
+		newGameBtn.setOnAction(event -> {
+			logic = new GameLogic(pauseMenu, bgCanvas.getGraphicsContext2D(), nextBlockCanvas.getGraphicsContext2D(),
+					this);
 			logic.drawGraphics(blockCanvas.getGraphicsContext2D());
 			initScoreListener();
 			pauseMenu.setVisible(false);
 			resumeBtn.setDisable(false);
 			saveBtn.setDisable(false);
 		});
-		
+
 		loadBtn.setOnAction(event -> {
 			logic = (GameLogic) rwHandler.readFiles(logic, SAVEFILE_FILENAME);
 			logic.initFromSave(pauseMenu, bgCanvas.getGraphicsContext2D(), nextBlockCanvas.getGraphicsContext2D(),
@@ -125,11 +127,13 @@ public class Controller implements Initializable {
 		goBtn.setOnAction(event -> {
 			hsHandler.addEntry(goField.getText(), logic.getScore().intValue());
 			goMenu.setVisible(false);
+			pauseMenu.setVisible(true);
 			rwHandler.writeFile(hsHandler.getHighscoreList(), HIGHSCORE_FILENAME);
 		});
 
 		highscoresBtn.setOnAction(event -> {
-			// This row is suppressed because casting ArrayList to object is unsafe, however using this 
+			// This row is suppressed because casting ArrayList to object is
+			// unsafe, however using this
 			// approach we can keep hsHandler as open-ended as possible.
 			hsHandler.setHighscoreList(
 					(ArrayList<HighscoreEntry>) rwHandler.readFiles(hsHandler.getHighscoreList(), HIGHSCORE_FILENAME));
@@ -139,6 +143,7 @@ public class Controller implements Initializable {
 
 		hsBtn.setOnAction(event -> {
 			hsMenu.setVisible(!hsMenu.isVisible());
+			pauseMenu.setVisible(true);
 		});
 
 		exitBtn.setOnAction(event -> {
@@ -174,6 +179,10 @@ public class Controller implements Initializable {
 		running = true;
 		int gameCount = 0;
 		while (running) {
+			if (logic.isInstantUpdate()) {
+				gameCount = logic.getUpdateTime();
+				logic.setInstantUpdate(false);
+			}
 			if (gameCount >= logic.getUpdateTime()) {
 				logic.gameUpdate();
 				gameCount = 0;
@@ -208,7 +217,6 @@ public class Controller implements Initializable {
 	}
 
 	private void handleHighscore() {
-		pauseMenu.setVisible(true);
 		if (hsHandler.isHighscore(logic.getScore().intValue())) {
 			goMenu.setVisible(true);
 		} else {

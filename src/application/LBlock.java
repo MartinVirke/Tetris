@@ -2,6 +2,9 @@ package application;
 
 public class LBlock extends Block{
 
+	// Auto-generated variable.
+	private static final long serialVersionUID = 1L;
+
 	public LBlock(int x, int y, int rot) {
 		super(x, y, rot, Color.RED);
 		// Gets coords with 1st index of two containers, so show cell at x = 0, y = -1, x = 0, y = 0 etc.

@@ -2,6 +2,9 @@ package application;
 
 public class SBlock extends Block{
 
+	// Auto-generated variable.
+	private static final long serialVersionUID = 1L;
+
 	public SBlock(int x, int y, int rot) {
 		super(x, y, rot, Color.PURPLE);
 

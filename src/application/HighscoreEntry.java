@@ -5,6 +5,9 @@ import java.util.Date;
 
 public class HighscoreEntry implements Serializable {
 
+	// Auto-generated variable.
+	private static final long serialVersionUID = 1L;
+	
 	private String name;
 	private int score;
 	private Date date;

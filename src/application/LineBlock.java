@@ -2,6 +2,9 @@ package application;
 
 public class LineBlock extends Block{
 
+	// Auto-generated variable.
+	private static final long serialVersionUID = 1L;
+
 	public LineBlock(int x, int y, int rot) {
 		super(x, y, rot, Color.LIGHTBLUE);
 

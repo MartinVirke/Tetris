@@ -6,6 +6,9 @@ import javafx.scene.paint.Color;
 
 public class Cell implements Serializable {
 
+	// Auto-generated variable.
+	private static final long serialVersionUID = 1L;
+	
 	private int x, y, imageId;
 	private boolean alive;
 	private double r, g, b, a;

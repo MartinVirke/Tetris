@@ -8,6 +8,9 @@ import javafx.beans.property.SimpleIntegerProperty;
 
 public class SimpleIntegerPropertySerializable extends SimpleIntegerProperty implements Serializable {
 
+	// Auto-generated variable.
+	private static final long serialVersionUID = 1L;
+	
 	private Integer serializableValue;
 	
 	public SimpleIntegerPropertySerializable(Integer initialValue) {

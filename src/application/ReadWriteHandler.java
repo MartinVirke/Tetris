@@ -13,7 +13,7 @@ public class ReadWriteHandler {
 		try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(setPath(filename)))) {
 			out.writeObject(o);
 		} catch (IOException e) {
-			 e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 
@@ -21,8 +21,8 @@ public class ReadWriteHandler {
 		try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(setPath(filename)))) {
 			return in.readObject();
 		} catch (IOException | ClassNotFoundException e) {
-			 e.printStackTrace();
-			 return o;
+			e.printStackTrace();
+			return o;
 		}
 	}
 
@@ -31,7 +31,6 @@ public class ReadWriteHandler {
 		File file = null;
 		file = new File(filename);
 		pathString = file.getPath();
-		System.out.println(pathString);
 		return pathString;
 	}
 

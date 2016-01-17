@@ -2,6 +2,9 @@ package application;
 
 public class SquareBlock extends Block{
 
+	// Auto-generated variable.
+	private static final long serialVersionUID = 1L;
+
 	public SquareBlock(int x, int y, int rot) {
 		super(x, y, rot, Color.BLUE);
 

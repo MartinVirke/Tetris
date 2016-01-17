@@ -6,11 +6,14 @@ import java.util.Random;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
 public class GameLogic implements Serializable {
 
+	// Auto-generated variable
+	private static final long serialVersionUID = 1L;
+	
 	private int cellsInX;
 	private int cellsInY;
 	private int updateTime, spawnX, spawnY;
@@ -23,27 +26,30 @@ public class GameLogic implements Serializable {
 	private Cell[][] cellArray;
 	private SimpleIntegerPropertySerializable score;
 	private State state;
-	
+
+	private transient boolean instantUpdate;
 	private transient Controller controller;
 	private transient GraphicsContext bgGc, nextBlockGc;
-	private transient VBox pauseMenu;
+	private transient Pane pauseMenu;
 	private transient Image[] imageArray;
 
 	private enum Action {
 		LEFT, RIGHT, ROTATE, DROP, FALL, SHOW
 	}
 
-	public GameLogic(VBox pauseMenu, GraphicsContext bgGc, GraphicsContext nextBlockGc, Controller controller) {
+	public GameLogic(Pane pauseMenu, GraphicsContext bgGc, GraphicsContext nextBlockGc, Controller controller) {
 		super();
-		this.cellsInX = 10;
-		this.cellsInY = 20;
-		this.cellArray = new Cell[cellsInX][cellsInY];
-		this.spawnX = 4;
-		this.spawnY = 1;
 		this.bgGc = bgGc;
 		this.nextBlockGc = nextBlockGc;
 		this.pauseMenu = pauseMenu;
 		this.controller = controller;
+		
+		cellsInX = 10;
+		cellsInY = 20;
+		cellArray = new Cell[cellsInX][cellsInY];
+		spawnX = 4;
+		spawnY = 1;
+		instantUpdate = false;
 		score = new SimpleIntegerPropertySerializable(0);
 		addImages();
 		addBlocks();
@@ -55,9 +61,8 @@ public class GameLogic implements Serializable {
 		updateTime = 20;
 	}
 
-	public void initFromSave(VBox pauseMenu, GraphicsContext bgGc, GraphicsContext nextBlockGc, Controller controller) {
+	public void initFromSave(Pane pauseMenu, GraphicsContext bgGc, GraphicsContext nextBlockGc, Controller controller) {
 		addImages();
-
 		this.pauseMenu = pauseMenu;
 		this.bgGc = bgGc;
 		this.nextBlockGc = nextBlockGc;
@@ -275,11 +280,10 @@ public class GameLogic implements Serializable {
 	private void spawnBlock() {
 		currentBlock = nextBlock;
 		newBlock();
-
 		if (!isValidCell(0, currentBlock)) {
 			gameOver();
 		}
-		// instantUpdate = true;
+		instantUpdate = true;
 		removeLines();
 	}
 
@@ -394,6 +398,14 @@ public class GameLogic implements Serializable {
 					(nextBlock.getPattern()[nextBlock.getRot()][i] * unit) + unit,
 					(nextBlock.getPattern()[nextBlock.getYRot()][i] * unit) + unit, unit, unit);
 		}
+	}
+
+	public boolean isInstantUpdate() {
+		return instantUpdate;
+	}
+
+	public void setInstantUpdate(boolean instantUpdate) {
+		this.instantUpdate = instantUpdate;
 	}
 
 	public State getState() {

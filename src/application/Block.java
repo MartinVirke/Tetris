@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 public abstract class Block implements Serializable{
 
+	// Auto-generated variable.
+	private static final long serialVersionUID = 1L;
 	private int x, y, rot;
 	protected int[][] pattern;
 	protected Color color;
@@ -20,7 +22,6 @@ public abstract class Block implements Serializable{
 		this.color = color;
 		}
 
-	// Polymorphism
 	public abstract Block makeCopy();
 	
 	public Color getColor() {
@@ -52,7 +53,6 @@ public abstract class Block implements Serializable{
 	}
 
 	public void incRot() {
-//		this.rot = rot + 1 > 3 ? 0 : rot + 1;
 		this.rot = rot - 1 < 0 ? 3 : rot - 1;
 	}
 	
