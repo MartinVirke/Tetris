@@ -20,14 +20,6 @@ public class Main extends Application {
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
 			primaryStage.show();
-
-			Controller ctrl = fxmlLoader.getController();
-			Thread graphicsThread = new Thread(()->{
-				ctrl.simpleLoop();
-			});
-			graphicsThread.setName("graphicsThread");
-			graphicsThread.start();
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

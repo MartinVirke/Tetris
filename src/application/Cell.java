@@ -8,10 +8,11 @@ public class Cell implements Serializable {
 
 	// Auto-generated variable.
 	private static final long serialVersionUID = 1L;
-	
+
 	private int x, y, imageId;
 	private boolean alive;
 	private double r, g, b, a;
+
 	private transient Color bgColor, bgShade;
 
 	public Cell(int x, int y) {
@@ -24,7 +25,7 @@ public class Cell implements Serializable {
 		this.bgColor = new Color(r, g, b, 1.0f);
 		this.bgShade = new Color(0.0f, 0.0f, 0.0f, this.a);
 	}
-	
+
 	public void setColors(double r, double g, double b, double a) {
 		this.r = r;
 		this.g = g;
@@ -33,25 +34,36 @@ public class Cell implements Serializable {
 		setColors();
 	}
 
-
 	public boolean isAlive() {
 		return alive;
-	}
-
-	public void setBgShade(Color bgShade) {
-		this.bgShade = bgShade;
 	}
 
 	public Color getBgShade() {
 		return bgShade;
 	}
 
-	public void setBgColor(Color bgColor) {
-		this.bgColor = bgColor;
-	}
-
 	public Color getBgColor() {
 		return bgColor;
+	}
+
+	public int getX() {
+		return x;
+	}
+
+	public int getY() {
+		return y;
+	}
+
+	public int getImageId() {
+		return imageId;
+	}
+
+	public void setBgShade(Color bgShade) {
+		this.bgShade = bgShade;
+	}
+
+	public void setBgColor(Color bgColor) {
+		this.bgColor = bgColor;
 	}
 
 	public void setX(int x) {
@@ -68,18 +80,6 @@ public class Cell implements Serializable {
 
 	public void setImageId(int imageId) {
 		this.imageId = imageId;
-	}
-
-	public int getX() {
-		return x;
-	}
-
-	public int getY() {
-		return y;
-	}
-
-	public int getImageId() {
-		return imageId;
 	}
 
 }

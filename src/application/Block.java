@@ -6,15 +6,16 @@ public abstract class Block implements Serializable{
 
 	// Auto-generated variable.
 	private static final long serialVersionUID = 1L;
+	
 	private int x, y, rot;
+	private Color color;
+
 	protected int[][] pattern;
-	protected Color color;
 	
 	protected enum Color{
 		BLUE, GREEN, LIGHTBLUE, PURPLE, RED, TURQUOISE, YELLOW
 	}
 	
-
 	public Block(int x, int y, int rot, Color color) {
 		this.x = x;
 		this.y = y;
@@ -44,6 +45,10 @@ public abstract class Block implements Serializable{
 		return this.rot + 1 > 3 ? 0 : this.rot + 1;
 	}
 	
+	public int[][] getPattern() {
+		return pattern;
+	}
+	
 	public void setX(int x) {
 		this.x = x;
 	}
@@ -59,10 +64,5 @@ public abstract class Block implements Serializable{
 	public void setRot(int i){
 		this.rot = i;
 	}
-
-	public int[][] getPattern() {
-		return pattern;
-	}
-
 
 }

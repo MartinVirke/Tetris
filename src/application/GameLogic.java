@@ -13,15 +13,16 @@ public class GameLogic implements Serializable {
 
 	// Auto-generated variable
 	private static final long serialVersionUID = 1L;
-	
-	private int cellsInX;
-	private int cellsInY;
-	private int updateTime, spawnX, spawnY;
+
+	private final int CELLS_IN_X = 10;
+	private final int CELLS_IN_Y = 20;
+	private final int SPAWN_X = 4;
+	private final int SPAWN_Y = 1;
+
+	private int updateTime;
 	private float unit;
 
-	private Block currentBlock;
-	private Block nextStepBlock;
-	private Block nextBlock;
+	private Block currentBlock, nextStepBlock, nextBlock;
 	private Block[] blockArray;
 	private Cell[][] cellArray;
 	private SimpleIntegerPropertySerializable score;
@@ -29,7 +30,7 @@ public class GameLogic implements Serializable {
 
 	private transient boolean instantUpdate;
 	private transient Controller controller;
-	private transient GraphicsContext bgGc, nextBlockGc;
+	private transient GraphicsContext bgGc;
 	private transient Pane pauseMenu;
 	private transient Image[] imageArray;
 
@@ -37,18 +38,13 @@ public class GameLogic implements Serializable {
 		LEFT, RIGHT, ROTATE, DROP, FALL, SHOW
 	}
 
-	public GameLogic(Pane pauseMenu, GraphicsContext bgGc, GraphicsContext nextBlockGc, Controller controller) {
+	public GameLogic(Pane pauseMenu, GraphicsContext bgGc, Controller controller) {
 		super();
 		this.bgGc = bgGc;
-		this.nextBlockGc = nextBlockGc;
 		this.pauseMenu = pauseMenu;
 		this.controller = controller;
-		
-		cellsInX = 10;
-		cellsInY = 20;
-		cellArray = new Cell[cellsInX][cellsInY];
-		spawnX = 4;
-		spawnY = 1;
+
+		cellArray = new Cell[CELLS_IN_X][CELLS_IN_Y];
 		instantUpdate = false;
 		score = new SimpleIntegerPropertySerializable(0);
 		addImages();
@@ -61,14 +57,13 @@ public class GameLogic implements Serializable {
 		updateTime = 20;
 	}
 
-	public void initFromSave(Pane pauseMenu, GraphicsContext bgGc, GraphicsContext nextBlockGc, Controller controller) {
+	public void initFromSave(Pane pauseMenu, GraphicsContext bgGc, Controller controller) {
 		addImages();
 		this.pauseMenu = pauseMenu;
 		this.bgGc = bgGc;
-		this.nextBlockGc = nextBlockGc;
 		this.controller = controller;
-		for (int i = 0; i < cellsInY; i++) {
-			for (int j = 0; j < cellsInX; j++) {
+		for (int i = 0; i < CELLS_IN_Y; i++) {
+			for (int j = 0; j < CELLS_IN_X; j++) {
 				cellArray[j][i].setColors();
 			}
 		}
@@ -93,18 +88,18 @@ public class GameLogic implements Serializable {
 
 	private void addBlocks() {
 		blockArray = new Block[7];
-		blockArray[0] = new LBlock(spawnX, spawnY, 1);
-		blockArray[1] = new RLBlock(spawnX, spawnY, 3);
-		blockArray[2] = new SBlock(spawnX, spawnY, 2);
-		blockArray[3] = new RSBlock(spawnX, spawnY, 2);
-		blockArray[4] = new SquareBlock(spawnX, spawnY, 3);
-		blockArray[5] = new TBlock(spawnX, spawnY, 2);
-		blockArray[6] = new LineBlock(spawnX, spawnY, 3);
+		blockArray[0] = new LBlock(SPAWN_X, SPAWN_Y, 1);
+		blockArray[1] = new RLBlock(SPAWN_X, SPAWN_Y, 3);
+		blockArray[2] = new SBlock(SPAWN_X, SPAWN_Y, 2);
+		blockArray[3] = new RSBlock(SPAWN_X, SPAWN_Y, 2);
+		blockArray[4] = new SquareBlock(SPAWN_X, SPAWN_Y, 3);
+		blockArray[5] = new TBlock(SPAWN_X, SPAWN_Y, 2);
+		blockArray[6] = new LineBlock(SPAWN_X, SPAWN_Y, 3);
 	}
 
 	private void populateArray() {
-		for (int i = 0; i < cellsInY; i++) {
-			for (int j = 0; j < cellsInX; j++) {
+		for (int i = 0; i < CELLS_IN_Y; i++) {
+			for (int j = 0; j < CELLS_IN_X; j++) {
 				cellArray[j][i] = new Cell(j, i);
 			}
 		}
@@ -158,7 +153,6 @@ public class GameLogic implements Serializable {
 
 	private void dropBlock() {
 		setState(State.DROPPING);
-
 		nextStepBlock = currentBlock.makeCopy();
 		deactivateBlockCells(currentBlock);
 		nextStepBlock.setY(findLowpoint(nextStepBlock));
@@ -205,7 +199,7 @@ public class GameLogic implements Serializable {
 		}
 	}
 
-	boolean isValidCell(int index, Block block) {
+	private boolean isValidCell(int index, Block block) {
 		try {
 			if (cellArray[getCellX(index, block)][getCellY(index, block)].isAlive()) {
 				return false;
@@ -222,10 +216,8 @@ public class GameLogic implements Serializable {
 	}
 
 	private void updateBlock(Action action) {
-
 		nextStepBlock = currentBlock.makeCopy();
 		deactivateBlockCells(currentBlock);
-
 		switch (action) {
 		case ROTATE:
 			nextStepBlock.incRot();
@@ -242,7 +234,6 @@ public class GameLogic implements Serializable {
 		default:
 			break;
 		}
-
 		if (!isValidCell(0, nextStepBlock)) {
 			activateBlockCells(currentBlock);
 			if (action == Action.FALL) {
@@ -253,7 +244,6 @@ public class GameLogic implements Serializable {
 			activateBlockCells(nextStepBlock);
 			currentBlock = nextStepBlock;
 		}
-
 	}
 
 	private int findLowpoint(Block block) {
@@ -294,14 +284,14 @@ public class GameLogic implements Serializable {
 	private void removeLines() {
 		int count = 0;
 		int linesCleared = 0;
-		for (int i = 0; i < cellsInY; i++) {
-			for (int j = 0; j < cellsInX; j++) {
+		for (int i = 0; i < CELLS_IN_Y; i++) {
+			for (int j = 0; j < CELLS_IN_X; j++) {
 				if (!cellArray[j][i].isAlive())
 					break;
 				else {
 					count++;
 				}
-				if (count == cellsInX) {
+				if (count == CELLS_IN_X) {
 					moveLinesDown(i);
 					linesCleared++;
 				}
@@ -314,7 +304,7 @@ public class GameLogic implements Serializable {
 
 	private void moveLinesDown(int startRow) {
 		for (int i = startRow; i > 0; i--) {
-			for (int j = 0; j < cellsInX; j++) {
+			for (int j = 0; j < CELLS_IN_X; j++) {
 				cellArray[j][i].setAlive(cellArray[j][i - 1].isAlive());
 				cellArray[j][i].setImageId(cellArray[j][i - 1].getImageId());
 			}
@@ -341,16 +331,16 @@ public class GameLogic implements Serializable {
 	}
 
 	private void setBackground() {
-		double cellsX = (double) cellsInX / 2;
+		double cellsX = (double) CELLS_IN_X / 2;
 		double sumX, sumY, totalsum;
 		double di;
 		double dj;
 
-		unit = (float) (bgGc.getCanvas().getWidth() / cellsInX);
+		unit = (float) (bgGc.getCanvas().getWidth() / CELLS_IN_X);
 		bgGc.setStroke(Color.BLACK);
 
-		for (int i = 0; i < cellsInY; i++) {
-			for (int j = 0; j < cellsInX; j++) {
+		for (int i = 0; i < CELLS_IN_Y; i++) {
+			for (int j = 0; j < CELLS_IN_X; j++) {
 
 				Cell cell = cellArray[j][i];
 
@@ -380,11 +370,11 @@ public class GameLogic implements Serializable {
 		}
 	}
 
-	public void drawGraphics(GraphicsContext blockGc) {
+	public void drawGraphics(GraphicsContext blockGc, GraphicsContext nextBlockGc) {
 		blockGc.clearRect(0, 0, blockGc.getCanvas().getWidth(), blockGc.getCanvas().getHeight());
 		nextBlockGc.clearRect(0, 0, nextBlockGc.getCanvas().getWidth(), nextBlockGc.getCanvas().getHeight());
-		for (int i = 0; i < cellsInY; i++) {
-			for (int j = 0; j < cellsInX; j++) {
+		for (int i = 0; i < CELLS_IN_Y; i++) {
+			for (int j = 0; j < CELLS_IN_X; j++) {
 				if (cellArray[j][i].isAlive()) {
 					blockGc.drawImage(imageArray[cellArray[j][i].getImageId()], j * unit, i * unit, unit, unit);
 					blockGc.setFill(cellArray[j][i].getBgShade());
@@ -392,7 +382,6 @@ public class GameLogic implements Serializable {
 				}
 			}
 		}
-
 		for (int i = 0; i < 4; i++) {
 			nextBlockGc.drawImage(imageArray[nextBlock.getColor().ordinal()],
 					(nextBlock.getPattern()[nextBlock.getRot()][i] * unit) + unit,

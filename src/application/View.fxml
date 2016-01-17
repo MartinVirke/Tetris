@@ -13,79 +13,83 @@
 
 <Pane fx:id="rootPane" prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.Controller">
    <children>
-      <BorderPane fx:id="goMenu" layoutX="175.0" layoutY="140.0" prefHeight="180.0" prefWidth="250.0" visible="false">
-         <top>
-            <Label text="Game over! &#10;Enter your name!" BorderPane.alignment="CENTER">
-               <font>
-                  <Font name="Impact" size="32.0" />
-               </font>
-            </Label>
-         </top>
-         <bottom>
-            <Button fx:id="goBtn" mnemonicParsing="false" text="Submit highscore" BorderPane.alignment="CENTER" />
-         </bottom>
-         <center>
-            <Pane BorderPane.alignment="CENTER">
-               <children>
-                  <TextField fx:id="goField" layoutX="50.0" layoutY="25.0" prefHeight="25.0" prefWidth="150.0">
+      <Pane fx:id="positionalPane">
+         <children>
+            <BorderPane fx:id="goMenu" layoutX="175.0" layoutY="140.0" prefHeight="180.0" prefWidth="250.0" visible="false">
+               <top>
+                  <Label text="Game over! &#10;Enter your name!" BorderPane.alignment="CENTER">
                      <font>
-                        <Font name="Impact" size="12.0" />
+                        <Font name="Impact" size="32.0" />
                      </font>
-                  </TextField>
+                  </Label>
+               </top>
+               <bottom>
+                  <Button fx:id="goBtn" mnemonicParsing="false" text="Submit highscore" BorderPane.alignment="CENTER" />
+               </bottom>
+               <center>
+                  <Pane BorderPane.alignment="CENTER">
+                     <children>
+                        <TextField fx:id="goField" layoutX="50.0" layoutY="25.0" prefHeight="25.0" prefWidth="150.0">
+                           <font>
+                              <Font name="Impact" size="12.0" />
+                           </font>
+                        </TextField>
+                     </children>
+                  </Pane>
+               </center>
+            </BorderPane>
+            <BorderPane fx:id="hsMenu" layoutX="150.0" layoutY="140.0" prefHeight="320.0" prefWidth="300.0" visible="false">
+               <bottom>
+                  <Button fx:id="hsBtn" mnemonicParsing="false" text="Close" BorderPane.alignment="BOTTOM_RIGHT" />
+               </bottom>
+               <center>
+                  <Label fx:id="hsLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="382.0" prefWidth="327.0" text="Label" BorderPane.alignment="CENTER">
+                     <font>
+                        <Font name="Impact" size="32.0" />
+                     </font>
+                  </Label>
+               </center>
+            </BorderPane>
+            <VBox fx:id="vBox1" prefHeight="600.0" prefWidth="600.0">
+               <children>
+                  <HBox fx:id="hBox1">
+                     <children>
+                        <StackPane prefHeight="600.0" prefWidth="616.0">
+                           <children>
+                              <Label fx:id="scoreLabel" contentDisplay="CENTER" prefHeight="29.0" prefWidth="132.0" text="Label" textFill="#0022ff" textOverrun="CLIP" StackPane.alignment="CENTER_RIGHT">
+                                 <font>
+                                    <Font name="Impact" size="24.0" />
+                                 </font>
+                                 <effect>
+                                    <Reflection bottomOpacity="0.08" fraction="1.0" topOpacity="0.32" />
+                                 </effect>
+                                 <StackPane.margin>
+                                    <Insets bottom="275.0" right="10.0" />
+                                 </StackPane.margin>
+                              </Label>
+                              <Canvas fx:id="blockCanvas" height="600.0" width="300.0" />
+                              <Canvas fx:id="bgCanvas" height="600.0" width="300.0" />
+                              <Canvas fx:id="nextBlockCanvas" height="150.0" width="150.0" StackPane.alignment="CENTER_LEFT">
+                                 <StackPane.margin>
+                                    <Insets bottom="225.0" left="5.0" />
+                                 </StackPane.margin>
+                              </Canvas>
+                           </children>
+                        </StackPane>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+            <Pane fx:id="pauseMenu" layoutX="150.0" layoutY="140.0" prefHeight="300.0" prefWidth="300.0" visible="false">
+               <children>
+                  <Button fx:id="resumeBtn" layoutX="110.0" layoutY="37.5" mnemonicParsing="false" prefWidth="80.0" text="Resume" />
+                  <Button fx:id="newGameBtn" layoutX="110.0" layoutY="75.0" mnemonicParsing="false" prefWidth="80.0" text="New game" />
+                  <Button fx:id="loadBtn" layoutX="110.0" layoutY="112.5" mnemonicParsing="false" prefWidth="80.0" text="Load" />
+                  <Button fx:id="saveBtn" layoutX="110.0" layoutY="150.0" mnemonicParsing="false" prefWidth="80.0" text="Save" />
+                  <Button fx:id="highscoresBtn" layoutX="110.0" layoutY="187.5" mnemonicParsing="false" prefWidth="80.0" text="Highscores" />
+                  <Button fx:id="exitBtn" layoutX="110.0" layoutY="225.0" mnemonicParsing="false" prefWidth="80.0" text="Exit" />
                </children>
             </Pane>
-         </center>
-      </BorderPane>
-      <BorderPane fx:id="hsMenu" layoutX="150.0" layoutY="140.0" prefHeight="320.0" prefWidth="300.0" visible="false">
-         <bottom>
-            <Button fx:id="hsBtn" mnemonicParsing="false" text="Close" BorderPane.alignment="BOTTOM_RIGHT" />
-         </bottom>
-         <center>
-            <Label fx:id="hsLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="382.0" prefWidth="327.0" text="Label" BorderPane.alignment="CENTER">
-               <font>
-                  <Font name="Impact" size="32.0" />
-               </font>
-            </Label>
-         </center>
-      </BorderPane>
-      <VBox fx:id="vBox1" prefHeight="600.0" prefWidth="600.0">
-         <children>
-            <HBox fx:id="hBox1">
-               <children>
-                  <StackPane prefHeight="600.0" prefWidth="616.0">
-                     <children>
-                        <Label fx:id="scoreLabel" contentDisplay="CENTER" prefHeight="29.0" prefWidth="132.0" text="Label" textFill="#0022ff" textOverrun="CLIP" StackPane.alignment="CENTER_RIGHT">
-                           <font>
-                              <Font name="Impact" size="24.0" />
-                           </font>
-                           <effect>
-                              <Reflection bottomOpacity="0.08" fraction="1.0" topOpacity="0.32" />
-                           </effect>
-                           <StackPane.margin>
-                              <Insets bottom="250.0" right="10.0" />
-                           </StackPane.margin>
-                        </Label>
-                        <Canvas fx:id="blockCanvas" height="600.0" width="300.0" />
-                        <Canvas fx:id="bgCanvas" height="600.0" width="300.0" />
-                        <Canvas fx:id="nextBlockCanvas" height="150.0" width="150.0" StackPane.alignment="CENTER_LEFT">
-                           <StackPane.margin>
-                              <Insets bottom="250.0" left="5.0" />
-                           </StackPane.margin>
-                        </Canvas>
-                     </children>
-                  </StackPane>
-               </children>
-            </HBox>
-         </children>
-      </VBox>
-      <Pane fx:id="pauseMenu" layoutX="150.0" layoutY="140.0" prefHeight="300.0" prefWidth="300.0" visible="false">
-         <children>
-            <Button fx:id="resumeBtn" layoutX="110.0" layoutY="37.5" mnemonicParsing="false" prefWidth="80.0" text="Resume" />
-            <Button fx:id="newGameBtn" layoutX="110.0" layoutY="75.0" mnemonicParsing="false" prefWidth="80.0" text="New game" />
-            <Button fx:id="loadBtn" layoutX="110.0" layoutY="112.5" mnemonicParsing="false" prefWidth="80.0" text="Load" />
-            <Button fx:id="saveBtn" layoutX="110.0" layoutY="150.0" mnemonicParsing="false" prefWidth="80.0" text="Save" />
-            <Button fx:id="highscoresBtn" layoutX="110.0" layoutY="187.5" mnemonicParsing="false" prefWidth="80.0" text="Highscores" />
-            <Button fx:id="exitBtn" layoutX="110.0" layoutY="225.0" mnemonicParsing="false" prefWidth="80.0" text="Exit" />
          </children>
       </Pane>
    </children>

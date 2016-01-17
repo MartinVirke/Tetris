@@ -10,7 +10,6 @@ public class TBlock extends Block{
 		this.pattern = new int[][] { { -1, 0, 1, 0 }, { 0, 0, 0, 1 }, { 1, 0, -1, 0 }, { 0, 0, 0, -1 } };
 	}
 	
-
 	@Override
 	public Block makeCopy() {
 		return new TBlock(this.getX(), this.getY(), this.getRot());
