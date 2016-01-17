@@ -26,6 +26,8 @@ public class LineBlock extends Block{
 		this.pattern = new int[][] { { 0, 0, 0, 0 }, { -2, -1, 0, 1 }, { 0, 0, 0, 0 }, { 2, 1, 0, -1 } };
 	}
 
+	// makeCopy() overridar den abstrakta metoden i Block.
+	
 	/**
 	 * Returns a copy of the block.
 	 */

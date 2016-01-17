@@ -69,7 +69,11 @@ public class Controller implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 
+		// Association: controller äger inte gamelogic, då det kan finnas flera
+		// controller klasser som påverkar gamelogic. Gamelogic har mening
+		// utanför kopplingen till controller, så som att lagra spelets data.
 		logic = new GameLogic(pauseMenu, bgCanvas.getGraphicsContext2D(), this);
+
 		rwHandler = new ReadWriteHandler();
 		hsHandler = new HighscoreHandler();
 

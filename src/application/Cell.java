@@ -35,6 +35,9 @@ public class Cell implements Serializable {
 		this.y = y;
 	}
 
+	// setColors är overloadad då den antingen kan kallas utan parametrar eller
+	// med r,g,b,a som parametrar.
+
 	/**
 	 * Sets the color of the cell based on stored variables. Used to easily
 	 * create new colors after loading the serialized class from a file.
@@ -71,11 +74,11 @@ public class Cell implements Serializable {
 	/**
 	 * @return alive Whether or not the cell is alive.
 	 */
-	
+
 	public boolean isAlive() {
 		return alive;
 	}
-	
+
 	/**
 	 * @return bgShade The shading to cast on the cell.
 	 */
@@ -83,7 +86,7 @@ public class Cell implements Serializable {
 	public Color getBgShade() {
 		return bgShade;
 	}
-	
+
 	/**
 	 * @return bgColor The background color of the cell.
 	 */
@@ -95,11 +98,11 @@ public class Cell implements Serializable {
 	/**
 	 * @return x The x position of the cell.
 	 */
-	
+
 	public int getX() {
 		return x;
 	}
-	
+
 	/**
 	 * @return y The y position of the cell.
 	 */
@@ -107,9 +110,10 @@ public class Cell implements Serializable {
 	public int getY() {
 		return y;
 	}
-	
+
 	/**
-	 * Gets the imageId which corresponds to the correct index of the array of images in GameLogic.
+	 * Gets the imageId which corresponds to the correct index of the array of
+	 * images in GameLogic.
 	 * 
 	 * @return imageId The image ID.
 	 */
@@ -117,41 +121,46 @@ public class Cell implements Serializable {
 	public int getImageId() {
 		return imageId;
 	}
-	
+
 	/**
-	 * @param bgShade The shading to cast on the cell.
+	 * @param bgShade
+	 *            The shading to cast on the cell.
 	 */
 
 	public void setBgShade(Color bgShade) {
 		this.bgShade = bgShade;
 	}
-	
+
 	/**
-	 * @param bgColor The background color of the cell.
+	 * @param bgColor
+	 *            The background color of the cell.
 	 */
 
 	public void setBgColor(Color bgColor) {
 		this.bgColor = bgColor;
 	}
-	
+
 	/**
-	 * @param x The x position of the cell.
+	 * @param x
+	 *            The x position of the cell.
 	 */
 
 	public void setX(int x) {
 		this.x = x;
 	}
-	
+
 	/**
-	 * @param y The y position of the cell.
+	 * @param y
+	 *            The y position of the cell.
 	 */
 
 	public void setY(int y) {
 		this.y = y;
 	}
-	
+
 	/**
-	 * @param alive Whether the cell is alive or not.
+	 * @param alive
+	 *            Whether the cell is alive or not.
 	 */
 
 	public void setAlive(boolean alive) {
@@ -159,9 +168,11 @@ public class Cell implements Serializable {
 	}
 
 	/**
-	 * @param imageId Set the id that corresponds to the correct image in the array of images.
+	 * @param imageId
+	 *            Set the id that corresponds to the correct image in the array
+	 *            of images.
 	 */
-	
+
 	public void setImageId(int imageId) {
 		this.imageId = imageId;
 	}

@@ -25,6 +25,12 @@ public class HighscoreHandler {
 		super();
 		this.highscore = new ArrayList<>();
 		this.highscoreComparator = new HighscoreComparator();
+
+		// Aggregering: HighscoreHandler har (flera) HighscoreEntry, ett entry
+		// kan dock leva med mening utan en instans av handler, så det är inte
+		// en komposition. T.ex. sparas alla entries i en fil, och kan laddas in
+		// i handlern igen senare.
+
 		highscore.add(new HighscoreEntry("Olle", 2000));
 		highscore.add(new HighscoreEntry("Jocke", 1000));
 		highscore.add(new HighscoreEntry("Turbo", 750));
@@ -74,13 +80,14 @@ public class HighscoreHandler {
 	 * Sets the highscore list to a new highscore list, used when reading a
 	 * highscore list from a file.
 	 * 
-	 * @param highscore The new highscore list which is read from file.
+	 * @param highscore
+	 *            The new highscore list which is read from file.
 	 */
 
 	public void setHighscoreList(ArrayList<HighscoreEntry> highscore) {
 		this.highscore = highscore;
 	}
-	
+
 	/**
 	 * Gets the highscore list for writing to file
 	 * 
@@ -90,7 +97,7 @@ public class HighscoreHandler {
 	public ArrayList<HighscoreEntry> getHighscoreList() {
 		return highscore;
 	}
-	
+
 	/**
 	 * Compiles a String of all the entries for easy output.
 	 * 

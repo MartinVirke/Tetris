@@ -20,6 +20,7 @@ public abstract class Block implements Serializable {
 	private int x, y, rot;
 	private Color color;
 
+	// Explanation of the pattern system can be found in the LBlock class.
 	protected int[][] pattern;
 
 	protected enum Color {
@@ -27,7 +28,6 @@ public abstract class Block implements Serializable {
 	}
 
 	/**
-	 * 
 	 * Stores the parameters in the new instance.
 	 * 
 	 * @param x X position of the new block.

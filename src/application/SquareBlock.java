@@ -24,6 +24,8 @@ public class SquareBlock extends Block{
 		super(x, y, rot, Color.BLUE);
 		this.pattern = new int[][] { { -1, 0, 0, -1 }, { -1, -1, 0, 0 }, { 1, 0, 0, 1 }, { 1, 1, 0, 0 } };
 	}
+	
+	// makeCopy() overridar den abstrakta metoden i Block.
 
 	/**
 	 * Returns a copy of the block.

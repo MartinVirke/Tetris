@@ -24,6 +24,8 @@ public class TBlock extends Block{
 		super(x, y, rot, Color.YELLOW);
 		this.pattern = new int[][] { { -1, 0, 1, 0 }, { 0, 0, 0, 1 }, { 1, 0, -1, 0 }, { 0, 0, 0, -1 } };
 	}
+	
+	// makeCopy() overridar den abstrakta metoden i Block.
 
 	/**
 	 * Returns a copy of the block.

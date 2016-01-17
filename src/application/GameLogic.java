@@ -69,6 +69,8 @@ public class GameLogic implements Serializable {
 		this.pauseMenu = pauseMenu;
 		this.controller = controller;
 
+		// Komposition: GameLogic har celler, och celler har ingen mening
+		// utanför GameLogics existens.
 		cellArray = new Cell[CELLS_IN_X][CELLS_IN_Y];
 		instantUpdate = false;
 		score = new SimpleIntegerPropertySerializable(0);
@@ -129,6 +131,8 @@ public class GameLogic implements Serializable {
 	}
 
 	private void addBlocks() {
+		// bockArray använder polymorfism för att instansiera och förvara olika
+		// subklasser till Block i samma array.
 		blockArray = new Block[7];
 		blockArray[0] = new LBlock(SPAWN_X, SPAWN_Y, 1);
 		blockArray[1] = new RLBlock(SPAWN_X, SPAWN_Y, 3);
@@ -224,6 +228,11 @@ public class GameLogic implements Serializable {
 
 	private void dropBlock() {
 		setState(State.DROPPING);
+		// currentBlock.makeCopy() kommer genom polymorfism kalla på den
+		// overridade metoden för att göra en kopia av samma typ som
+		// currentBlock hämtade ur arrayen. Detta eftersom nextStepBlock ska bli
+		// samma typ, inte den abstrakta klassen Block som inte går att
+		// instansiera,
 		nextStepBlock = currentBlock.makeCopy();
 		deactivateBlockCells(currentBlock);
 		nextStepBlock.setY(findLowpoint(nextStepBlock));
@@ -286,6 +295,11 @@ public class GameLogic implements Serializable {
 	}
 
 	private void updateBlock(Action action) {
+		// currentBlock.makeCopy() kommer genom polymorfism kalla på den
+		// overridade metoden för att göra en kopia av samma typ som
+		// currentBlock hämtade ur arrayen. Detta eftersom nextStepBlock ska bli
+		// samma typ, inte den abstrakta klassen Block som inte går att
+		// instansiera,
 		nextStepBlock = currentBlock.makeCopy();
 		deactivateBlockCells(currentBlock);
 		switch (action) {
@@ -334,6 +348,8 @@ public class GameLogic implements Serializable {
 	private void newBlock() {
 		Random random = new Random();
 		int randomInt = random.nextInt(7);
+		// nextBlock använder polymorfism för att tilldela sig själv till ett
+		// objekt i blockArray.
 		nextBlock = blockArray[randomInt];
 	}
 
